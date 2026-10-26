@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>com.apple.security.app-sandbox</key>
+	<true/>
+	<key>com.apple.security.network.client</key>
+	<true/>
+	<!-- Read-only access to the preference domain the (unsandboxed) host app
+	     writes the GitHub token / cached quota into. Works for ad-hoc or
+	     Developer ID distribution; not allowed on the Mac App Store. -->
+	<key>com.apple.security.temporary-exception.shared-preference.read-only</key>
+	<array>
+		<string>com.addo.copilotquota</string>
+	</array>
+</dict>
+</plist>

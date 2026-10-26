@@ -1,0 +1,483 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AA0000000000000000000070 /* CopilotQuotaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000040 /* CopilotQuotaApp.swift */; };
+		AA0000000000000000000071 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000041 /* ContentView.swift */; };
+		AA0000000000000000000072 /* DeviceFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000042 /* DeviceFlowView.swift */; };
+		AA000000000000000000007A /* QuotaModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000060 /* QuotaModels.swift */; };
+		AA000000000000000000007B /* CopilotQuotaClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000061 /* CopilotQuotaClient.swift */; };
+		AA000000000000000000007C /* GitHubDeviceFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000062 /* GitHubDeviceFlow.swift */; };
+		AA000000000000000000007D /* SharedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000063 /* SharedStore.swift */; };
+		AA000000000000000000007E /* CopilotIconShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000064 /* CopilotIconShape.swift */; };
+		AA000000000000000000007F /* QuotaRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000065 /* QuotaRingView.swift */; };
+		AA0000000000000000000080 /* CopilotQuotaWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000050 /* CopilotQuotaWidget.swift */; };
+		AA0000000000000000000081 /* QuotaModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000060 /* QuotaModels.swift */; };
+		AA0000000000000000000082 /* CopilotQuotaClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000061 /* CopilotQuotaClient.swift */; };
+		AA0000000000000000000083 /* SharedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000063 /* SharedStore.swift */; };
+		AA0000000000000000000084 /* CopilotIconShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000064 /* CopilotIconShape.swift */; };
+		AA0000000000000000000085 /* QuotaRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000065 /* QuotaRingView.swift */; };
+		AA0000000000000000000090 /* CopilotQuotaWidget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000054 /* CopilotQuotaWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		AA0000000000000000000095 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000046 /* Assets.xcassets */; };
+		AA0000000000000000000099 /* L10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000066 /* L10n.swift */; };
+		AA000000000000000000009A /* L10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000066 /* L10n.swift */; };
+		AA000000000000000000009B /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000047 /* Localizable.xcstrings */; };
+		AA000000000000000000009C /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000047 /* Localizable.xcstrings */; };
+		AA000000000000000000009D /* AppInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000049 /* AppInfo.swift */; };
+		AA000000000000000000009E /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000048 /* AboutView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		AA0000000000000000000022 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA0000000000000000000002 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AA0000000000000000000021;
+			remoteInfo = CopilotQuotaWidget;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		AA0000000000000000000024 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				AA0000000000000000000090 /* CopilotQuotaWidget.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		AA0000000000000000000040 /* CopilotQuotaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopilotQuotaApp.swift; sourceTree = "<group>"; };
+		AA0000000000000000000041 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		AA0000000000000000000042 /* DeviceFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceFlowView.swift; sourceTree = "<group>"; };
+		AA0000000000000000000049 /* AppInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppInfo.swift; sourceTree = "<group>"; };
+		AA0000000000000000000048 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		AA0000000000000000000043 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AA0000000000000000000046 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		AA0000000000000000000047 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		AA0000000000000000000044 /* Copilot Quota.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Copilot Quota.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA0000000000000000000050 /* CopilotQuotaWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopilotQuotaWidget.swift; sourceTree = "<group>"; };
+		AA0000000000000000000053 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AA0000000000000000000055 /* CopilotQuotaWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CopilotQuotaWidget.entitlements; sourceTree = "<group>"; };
+		AA0000000000000000000054 /* CopilotQuotaWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CopilotQuotaWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA0000000000000000000060 /* QuotaModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaModels.swift; sourceTree = "<group>"; };
+		AA0000000000000000000061 /* CopilotQuotaClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopilotQuotaClient.swift; sourceTree = "<group>"; };
+		AA0000000000000000000062 /* GitHubDeviceFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubDeviceFlow.swift; sourceTree = "<group>"; };
+		AA0000000000000000000063 /* SharedStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedStore.swift; sourceTree = "<group>"; };
+		AA0000000000000000000064 /* CopilotIconShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopilotIconShape.swift; sourceTree = "<group>"; };
+		AA0000000000000000000065 /* QuotaRingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaRingView.swift; sourceTree = "<group>"; };
+		AA0000000000000000000066 /* L10n.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = L10n.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		AA0000000000000000000026 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA0000000000000000000029 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		AA0000000000000000000010 = {
+			isa = PBXGroup;
+			children = (
+				AA0000000000000000000011 /* Products */,
+				AA0000000000000000000012 /* CopilotQuota */,
+				AA0000000000000000000013 /* CopilotQuotaWidget */,
+				AA0000000000000000000014 /* Shared */,
+			);
+			sourceTree = "<group>";
+		};
+		AA0000000000000000000011 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000000000000000000044 /* Copilot Quota.app */,
+				AA0000000000000000000054 /* CopilotQuotaWidget.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		AA0000000000000000000012 /* CopilotQuota */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000000000000000000040 /* CopilotQuotaApp.swift */,
+				AA0000000000000000000041 /* ContentView.swift */,
+				AA0000000000000000000042 /* DeviceFlowView.swift */,
+				AA0000000000000000000043 /* Info.plist */,
+				AA0000000000000000000046 /* Assets.xcassets */,
+				AA0000000000000000000049 /* AppInfo.swift */,
+				AA0000000000000000000048 /* AboutView.swift */,
+			);
+			path = CopilotQuota;
+			sourceTree = "<group>";
+		};
+		AA0000000000000000000013 /* CopilotQuotaWidget */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000000000000000000050 /* CopilotQuotaWidget.swift */,
+				AA0000000000000000000053 /* Info.plist */,
+				AA0000000000000000000055 /* CopilotQuotaWidget.entitlements */,
+			);
+			path = CopilotQuotaWidget;
+			sourceTree = "<group>";
+		};
+		AA0000000000000000000014 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000000000000000000060 /* QuotaModels.swift */,
+				AA0000000000000000000061 /* CopilotQuotaClient.swift */,
+				AA0000000000000000000062 /* GitHubDeviceFlow.swift */,
+				AA0000000000000000000063 /* SharedStore.swift */,
+				AA0000000000000000000064 /* CopilotIconShape.swift */,
+				AA0000000000000000000065 /* QuotaRingView.swift */,
+				AA0000000000000000000066 /* L10n.swift */,
+				AA0000000000000000000047 /* Localizable.xcstrings */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		AA0000000000000000000020 /* CopilotQuota */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA000000000000000000002E /* Build configuration list for PBXNativeTarget "CopilotQuota" */;
+			buildPhases = (
+				AA0000000000000000000025 /* Sources */,
+				AA0000000000000000000026 /* Frameworks */,
+				AA0000000000000000000027 /* Resources */,
+				AA0000000000000000000024 /* Embed App Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AA0000000000000000000023 /* PBXTargetDependency */,
+			);
+			name = CopilotQuota;
+			productName = "Copilot Quota";
+			productReference = AA0000000000000000000044 /* Copilot Quota.app */;
+			productType = "com.apple.product-type.application";
+		};
+		AA0000000000000000000021 /* CopilotQuotaWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA0000000000000000000031 /* Build configuration list for PBXNativeTarget "CopilotQuotaWidget" */;
+			buildPhases = (
+				AA0000000000000000000028 /* Sources */,
+				AA0000000000000000000029 /* Frameworks */,
+				AA000000000000000000002A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CopilotQuotaWidget;
+			productName = CopilotQuotaWidget;
+			productReference = AA0000000000000000000054 /* CopilotQuotaWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AA0000000000000000000002 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1700;
+				LastUpgradeCheck = 1700;
+				TargetAttributes = {
+					AA0000000000000000000020 = {
+						CreatedOnToolsVersion = 17.0;
+					};
+					AA0000000000000000000021 = {
+						CreatedOnToolsVersion = 17.0;
+					};
+				};
+			};
+			buildConfigurationList = AA000000000000000000002B /* Build configuration list for PBXProject "CopilotQuota" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				"zh-Hans",
+			);
+			mainGroup = AA0000000000000000000010;
+			productRefGroup = AA0000000000000000000011 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AA0000000000000000000020 /* CopilotQuota */,
+				AA0000000000000000000021 /* CopilotQuotaWidget */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		AA0000000000000000000027 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA0000000000000000000095 /* Assets.xcassets in Resources */,
+				AA000000000000000000009B /* Localizable.xcstrings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA000000000000000000002A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA000000000000000000009C /* Localizable.xcstrings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		AA0000000000000000000025 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA0000000000000000000070 /* CopilotQuotaApp.swift in Sources */,
+				AA0000000000000000000071 /* ContentView.swift in Sources */,
+				AA0000000000000000000072 /* DeviceFlowView.swift in Sources */,
+				AA000000000000000000007A /* QuotaModels.swift in Sources */,
+				AA000000000000000000007B /* CopilotQuotaClient.swift in Sources */,
+				AA000000000000000000007C /* GitHubDeviceFlow.swift in Sources */,
+				AA000000000000000000007D /* SharedStore.swift in Sources */,
+				AA000000000000000000007E /* CopilotIconShape.swift in Sources */,
+				AA000000000000000000007F /* QuotaRingView.swift in Sources */,
+				AA0000000000000000000099 /* L10n.swift in Sources */,
+				AA000000000000000000009D /* AppInfo.swift in Sources */,
+				AA000000000000000000009E /* AboutView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA0000000000000000000028 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA0000000000000000000080 /* CopilotQuotaWidget.swift in Sources */,
+				AA0000000000000000000081 /* QuotaModels.swift in Sources */,
+				AA0000000000000000000082 /* CopilotQuotaClient.swift in Sources */,
+				AA0000000000000000000083 /* SharedStore.swift in Sources */,
+				AA0000000000000000000084 /* CopilotIconShape.swift in Sources */,
+				AA0000000000000000000085 /* QuotaRingView.swift in Sources */,
+				AA000000000000000000009A /* L10n.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		AA0000000000000000000023 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA0000000000000000000021 /* CopilotQuotaWidget */;
+			targetProxy = AA0000000000000000000022 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		AA000000000000000000002C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		AA000000000000000000002D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_OPTIMIZATION_LEVEL = s;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				ONLY_ACTIVE_ARCH = NO;
+				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		AA000000000000000000002F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CopilotQuota/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Copilot Quota";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.addo.copilotquota;
+				PRODUCT_NAME = "Copilot Quota";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Debug;
+		};
+		AA0000000000000000000030 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CopilotQuota/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Copilot Quota";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.addo.copilotquota;
+				PRODUCT_NAME = "Copilot Quota";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Release;
+		};
+		AA0000000000000000000032 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				CODE_SIGN_ENTITLEMENTS = CopilotQuotaWidget/CopilotQuotaWidget.entitlements;
+				ENABLE_APP_SANDBOX = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CopilotQuotaWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.addo.copilotquota.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				WRAPPER_EXTENSION = appex;
+			};
+			name = Debug;
+		};
+		AA0000000000000000000033 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				CODE_SIGN_ENTITLEMENTS = CopilotQuotaWidget/CopilotQuotaWidget.entitlements;
+				ENABLE_APP_SANDBOX = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CopilotQuotaWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.addo.copilotquota.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				WRAPPER_EXTENSION = appex;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AA000000000000000000002B /* Build configuration list for PBXProject "CopilotQuota" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA000000000000000000002C /* Debug */,
+				AA000000000000000000002D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		AA000000000000000000002E /* Build configuration list for PBXNativeTarget "CopilotQuota" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA000000000000000000002F /* Debug */,
+				AA0000000000000000000030 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		AA0000000000000000000031 /* Build configuration list for PBXNativeTarget "CopilotQuotaWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA0000000000000000000032 /* Debug */,
+				AA0000000000000000000033 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = AA0000000000000000000002 /* Project object */;
+}
