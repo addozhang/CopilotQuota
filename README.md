@@ -46,3 +46,4 @@ xcodebuild -project CopilotQuota.xcodeproj -target CopilotQuota -configuration R
 - The widget extension is sandboxed; data is shared through a preference-domain
   read-only exception — fine for personal use, not App Store ready.
 - Sign out / refresh live in the app. UI is English + 简体中文, follows the system language.
+- The Copilot glyph is based on GitHub [Octicons](https://github.com/primer/octicons) (MIT).

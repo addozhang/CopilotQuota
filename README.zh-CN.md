@@ -43,3 +43,4 @@ xcodebuild -project CopilotQuota.xcodeproj -target CopilotQuota -configuration R
   所选间隔只是下限。
 - widget 扩展已沙盒化，通过偏好域只读例外共享数据——个人使用没问题，未按上架要求做。
 - 退出登录 / 手动刷新在 App 里。界面支持英文和简体中文，跟随系统语言。
+- Copilot 图标基于 GitHub [Octicons](https://github.com/primer/octicons)（MIT）。
