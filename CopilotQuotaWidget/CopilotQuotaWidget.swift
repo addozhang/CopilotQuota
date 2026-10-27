@@ -61,10 +61,10 @@ struct CopilotQuotaEntryView: View {
     /// systemSmall: ring + percentage, styled after the system battery widget —
     /// the ring/label group is centered with generous spacing between them.
     private var smallWidget: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 20) {
             QuotaRingView(percent: entry.display?.percentRemaining, size: 64)
             Text(percentText)
-                .font(.system(size: 19, weight: .medium))
+                .font(.system(size: 20, weight: .medium))
                 .monospacedDigit()
                 .foregroundStyle(.primary)
                 .lineLimit(1)

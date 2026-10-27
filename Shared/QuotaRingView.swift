@@ -22,16 +22,16 @@ public struct QuotaRingView: View {
     public var iconSize: CGFloat
 
     /// `lineWidth` / `iconSize` default to proportions of `size`, so every
-    /// usage scales as one unit — battery-widget style: stroke ≈ 13% and
-    /// icon ≈ 46% of the ring diameter.
+    /// usage scales as one unit — pixel-measured from the system battery
+    /// widget: stroke ≈ 9.5% and icon glyph ≈ 36.5% of the ring diameter.
     public init(percent: Double?,
                 size: CGFloat = 64,
                 lineWidth: CGFloat? = nil,
                 iconSize: CGFloat? = nil) {
         self.percent = percent
         self.size = size
-        self.lineWidth = lineWidth ?? size * 0.13
-        self.iconSize = iconSize ?? size * 0.46
+        self.lineWidth = lineWidth ?? size * 0.095
+        self.iconSize = iconSize ?? size * 0.52
     }
 
     public var body: some View {
