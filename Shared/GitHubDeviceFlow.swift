@@ -22,11 +22,13 @@ enum DeviceFlowError: LocalizedError {
 
 /// GitHub OAuth Device Flow.
 ///
-/// Uses the OAuth App client id that VS Code / the Copilot extension ships with,
-/// so the resulting `gho_…` token has access to the Copilot quota API.
-/// Same flow as CodexBar's Copilot provider (client id `Iv1.b507a08c87ecfe98`, scope `read:user`).
+/// Uses this project's own OAuth App ("CopilotQuota", Device Flow enabled),
+/// so tokens live in their own authorization bucket — re-authorizing other
+/// Copilot tools (or this app) does not revoke them, and vice versa.
+/// OAuth app tokens carry `read:user` scope; no client secret is needed for
+/// the device flow.
 struct GitHubDeviceFlow {
-    static let clientID = "Iv1.b507a08c87ecfe98"
+    static let clientID = "Ov23likPMhK9KRRdi42k"
     private let scope = "read:user"
 
     private let deviceCodeURL = URL(string: "https://github.com/login/device/code")!
@@ -92,9 +94,19 @@ struct GitHubDeviceFlow {
 
         var pair: TokenPair? {
             guard let accessToken, !accessToken.isEmpty else { return nil }
+            // A refresh token means the app is set to expire access tokens
+            // (~8h, renewable). Without one the token is non-expiring —
+            // don't invent a default expiry or validToken() would churn on a
+            // token that can never be refreshed.
+            let expiry: Int
+            if refreshToken != nil {
+                expiry = expiresInSeconds ?? 8 * 3600
+            } else {
+                expiry = expiresInSeconds ?? 100 * 365 * 24 * 3600 // non-expiring
+            }
             return TokenPair(accessToken: accessToken,
                              refreshToken: refreshToken,
-                             expiresInSeconds: expiresInSeconds ?? 8 * 3600)
+                             expiresInSeconds: expiry)
         }
     }
 
