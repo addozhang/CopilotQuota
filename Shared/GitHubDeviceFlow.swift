@@ -63,7 +63,39 @@ struct GitHubDeviceFlow {
     enum PollResult {
         case pending
         case slowDown
-        case success(String)
+        case success(TokenPair)
+    }
+
+    /// A token exchange result: access token plus the rotating refresh token
+    /// and its lifetime. GitHub App user-to-server access tokens expire after
+    /// 8 hours; refresh tokens after 6 months and are ROTATED on every use.
+    struct TokenPair {
+        let accessToken: String
+        let refreshToken: String?
+        let expiresInSeconds: Int
+    }
+
+    /// Decodes the shared shape of both the device-flow poll and the
+    /// refresh-token grant responses.
+    private struct RawTokenResponse: Decodable {
+        let accessToken: String?
+        let refreshToken: String?
+        let expiresInSeconds: Int?
+        let error: String?
+
+        enum CodingKeys: String, CodingKey {
+            case accessToken = "access_token"
+            case refreshToken = "refresh_token"
+            case expiresInSeconds = "expires_in"
+            case error
+        }
+
+        var pair: TokenPair? {
+            guard let accessToken, !accessToken.isEmpty else { return nil }
+            return TokenPair(accessToken: accessToken,
+                             refreshToken: refreshToken,
+                             expiresInSeconds: expiresInSeconds ?? 8 * 3600)
+        }
     }
 
     /// Step 1: ask GitHub for a device + user code.
@@ -86,7 +118,7 @@ struct GitHubDeviceFlow {
     }
 
     /// Step 2: poll until the user finishes the browser flow.
-    func waitForToken(deviceCode: String, interval: Int, expiresIn: Int) async throws -> String {
+    func waitForToken(deviceCode: String, interval: Int, expiresIn: Int) async throws -> TokenPair {
         let deadline = Date().addingTimeInterval(TimeInterval(max(60, expiresIn)))
         var step = TimeInterval(max(1, interval))
         while Date() < deadline {
@@ -117,24 +149,11 @@ struct GitHubDeviceFlow {
             "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
         ])
 
-        let (data, response) = try await URLSession.shared.data(for: request)
-        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
-            throw DeviceFlowError.network
-        }
-
-        struct RawTokenResponse: Decodable {
-            let accessToken: String?
-            let error: String?
-
-            enum CodingKeys: String, CodingKey {
-                case accessToken = "access_token"
-                case error
-            }
-        }
+        let (data, _) = try await URLSession.shared.data(for: request)
 
         let raw = try JSONDecoder().decode(RawTokenResponse.self, from: data)
-        if let token = raw.accessToken, !token.isEmpty {
-            return .success(token)
+        if let pair = raw.pair {
+            return .success(pair)
         }
         switch raw.error {
         case "authorization_pending":
@@ -152,9 +171,110 @@ struct GitHubDeviceFlow {
         }
     }
 
+    /// Refresh grant: exchange the (rotating) refresh token for a fresh pair.
+    /// MUST be called only from a context that can persist the result
+    /// (the host app) — GitHub invalidates the old refresh token on use.
+    func refreshTokens(refreshToken: String) async throws -> TokenPair {
+        var request = URLRequest(url: accessTokenURL)
+        request.httpMethod = "POST"
+        request.timeoutInterval = 30
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        request.httpBody = formBody([
+            "client_id": Self.clientID,
+            "grant_type": "refresh_token",
+            "refresh_token": refreshToken,
+        ])
+
+        let (data, _) = try await URLSession.shared.data(for: request)
+        let raw = try JSONDecoder().decode(RawTokenResponse.self, from: data)
+        if let pair = raw.pair {
+            return pair
+        }
+        // `invalid_grant` etc. — the refresh token expired/revoked; re-login.
+        throw DeviceFlowError.api(raw.error ?? "unexpected empty token response")
+    }
+
     private func formBody(_ fields: [String: String]) -> Data {
         var components = URLComponents()
         components.queryItems = fields.map { URLQueryItem(name: $0.key, value: $0.value) }
         return components.percentEncodedQuery?.data(using: .utf8) ?? Data()
+    }
+}
+
+// MARK: - TokenManager
+
+/// Token lifecycle for the host app: proactive refresh based on the stored
+/// expiry, with a 401-triggered forced refresh as fallback.
+///
+/// IMPORTANT: only the host app may run refreshes. The widget reads the
+/// shared preference domain read-only (entitlements) and every refresh
+/// ROTATES the stored refresh token — a widget-side refresh that cannot
+/// persist the new token would silently log the user out.
+enum TokenManager {
+    /// Refresh this early before the actual expiry, to avoid racing the clock.
+    private static let refreshMargin: TimeInterval = 5 * 60
+
+    enum Error: LocalizedError {
+        case signedOut
+
+        var errorDescription: String? {
+            switch self {
+            case .signedOut:
+                return L("GitHub token is invalid or expired (401). Please sign in again.")
+            }
+        }
+    }
+
+    /// Returns a usable access token, refreshing first when needed.
+    ///
+    /// - When `forceRefresh` is false: refreshes only if the stored expiry is
+    ///   missing or within `refreshMargin`. If there is no refresh token
+    ///   (a legacy login from before auto-refresh existed), the possibly-stale
+    ///   access token is returned as-is and the caller's 401 path recovers.
+    /// - Throws `QuotaError.unauthorized` when the refresh token itself is
+    ///   dead — in that case credentials are cleared and the user must
+    ///   re-authorize (refresh tokens live ~6 months).
+    static func validToken(forceRefresh: Bool = false) async throws -> String {
+        guard let storedToken = SharedStore.token else { throw Error.signedOut }
+
+        let needsRefresh: Bool
+        if forceRefresh {
+            needsRefresh = true
+        } else if let expiresAt = SharedStore.tokenExpiresAt {
+            needsRefresh = expiresAt <= Date().addingTimeInterval(refreshMargin)
+        } else {
+            needsRefresh = false // legacy login without recorded expiry
+        }
+
+        guard needsRefresh, let refreshToken = SharedStore.refreshToken else {
+            return storedToken
+        }
+
+        do {
+            let pair = try await GitHubDeviceFlow().refreshTokens(refreshToken: refreshToken)
+            SharedStore.storeTokenPair(accessToken: pair.accessToken,
+                                       refreshToken: pair.refreshToken,
+                                       expiresInSeconds: pair.expiresInSeconds)
+            return pair.accessToken
+        } catch {
+            // Rotated/expired/revoked refresh token: force re-login.
+            SharedStore.clearCredentials()
+            throw QuotaError.unauthorized
+        }
+    }
+
+    /// Fetch the quota with automatic token refresh and one 401 retry.
+    static func fetchQuota() async throws -> CopilotUserResponse {
+        let client = CopilotQuotaClient()
+        let token = try await validToken()
+        do {
+            return try await client.fetch(token: token)
+        } catch QuotaError.unauthorized {
+            // Token was rejected early (revoked / clock skew): force one
+            // refresh and retry before giving up.
+            let freshToken = try await validToken(forceRefresh: true)
+            return try await client.fetch(token: freshToken)
+        }
     }
 }

@@ -143,12 +143,14 @@ struct DeviceFlowView: View {
                 }
                 NSWorkspace.shared.open(url)
 
-                let token = try await flow.waitForToken(deviceCode: code.deviceCode,
-                                                        interval: code.interval,
-                                                        expiresIn: code.expiresIn)
+                let pair = try await flow.waitForToken(deviceCode: code.deviceCode,
+                                                       interval: code.interval,
+                                                       expiresIn: code.expiresIn)
                 guard !Task.isCancelled else { return }
-                SharedStore.token = token
-                model.token = token
+                SharedStore.storeTokenPair(accessToken: pair.accessToken,
+                                           refreshToken: pair.refreshToken,
+                                           expiresInSeconds: pair.expiresInSeconds)
+                model.token = pair.accessToken
                 // The post-login refresh must survive the view switch: once
                 // model.token is set this view disappears and onDisappear
                 // cancels flowTask — so refresh in a fresh task instead.

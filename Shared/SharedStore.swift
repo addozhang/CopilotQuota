@@ -28,6 +28,53 @@ enum SharedStore {
         }
     }
 
+    /// OAuth refresh token (`ghr_…`). GitHub rotates it on every refresh —
+    /// each refresh response returns a NEW refresh token and invalidates the
+    /// old one, so both values must be persisted together, atomically.
+    /// Only the host app may write it; the widget has read-only access.
+    static var refreshToken: String? {
+        get {
+            let raw = defaults.string(forKey: "githubRefreshToken")?
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            return (raw?.isEmpty == false) ? raw : nil
+        }
+        set {
+            if let newValue, !newValue.isEmpty {
+                defaults.set(newValue, forKey: "githubRefreshToken")
+            } else {
+                defaults.removeObject(forKey: "githubRefreshToken")
+            }
+        }
+    }
+
+    /// When the current access token expires (nil = unknown, legacy login).
+    static var tokenExpiresAt: Date? {
+        get { defaults.object(forKey: "githubTokenExpiresAt") as? Date }
+        set {
+            if let newValue {
+                defaults.set(newValue, forKey: "githubTokenExpiresAt")
+            } else {
+                defaults.removeObject(forKey: "githubTokenExpiresAt")
+            }
+        }
+    }
+
+    /// Persist a full token pair (access + refresh + expiry) in one go.
+    /// (Plain values, not a GitHubDeviceFlow.TokenPair, because the widget
+    /// target compiles this file but not GitHubDeviceFlow.swift.)
+    static func storeTokenPair(accessToken: String, refreshToken: String?, expiresInSeconds: Int) {
+        token = accessToken
+        self.refreshToken = refreshToken
+        tokenExpiresAt = Date().addingTimeInterval(TimeInterval(expiresInSeconds))
+    }
+
+    /// Clear all credentials (sign out / refresh token revoked).
+    static func clearCredentials() {
+        token = nil
+        refreshToken = nil
+        tokenExpiresAt = nil
+    }
+
     static var cachedDisplay: QuotaDisplay? {
         get {
             guard let data = defaults.data(forKey: "cachedDisplay") else { return nil }

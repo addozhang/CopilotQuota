@@ -63,25 +63,28 @@ final class AppModel: ObservableObject {
     }
 
     func refresh(silent: Bool = false) async {
-        guard let token else { return }
+        guard token != nil else { return }
         isRefreshing = !silent
         errorText = nil
         defer { isRefreshing = false }
         do {
-            let response = try await CopilotQuotaClient().fetch(token: token)
+            let response = try await TokenManager.fetchQuota()
             guard let display = response.display else {
                 throw QuotaError.notFound
             }
             self.display = display
             SharedStore.cachedDisplay = display
             WidgetCenter.shared.reloadAllTimelines()
+        } catch QuotaError.unauthorized where SharedStore.token == nil {
+            // Refresh token died — TokenManager already cleared credentials.
+            token = nil
         } catch {
             errorText = (error as? QuotaError)?.errorDescription ?? error.localizedDescription
         }
     }
 
     func signOut() {
-        SharedStore.token = nil
+        SharedStore.clearCredentials()
         SharedStore.cachedDisplay = nil
         token = nil
         display = nil
