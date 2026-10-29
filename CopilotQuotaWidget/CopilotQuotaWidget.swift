@@ -25,6 +25,15 @@ struct QuotaProvider: TimelineProvider {
                                 policy: .after(now.addingTimeInterval(min(refreshInterval, 1800)))))
             return
         }
+        // When the host app just refreshed and called reloadAllTimelines(),
+        // cachedDisplay is already fresh — render it immediately without a
+        // duplicate network round-trip.
+        if let cached = SharedStore.cachedDisplay,
+           now.timeIntervalSince(cached.fetchedAt) < 60 {
+            completion(Timeline(entries: [QuotaEntry(date: now, display: cached, needsSetup: false)],
+                                policy: .after(now.addingTimeInterval(refreshInterval))))
+            return
+        }
         Task {
             var display = SharedStore.cachedDisplay
             do {
