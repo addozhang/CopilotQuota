@@ -11,13 +11,16 @@
 ## 安装
 
 下载并解压 [最新版本](https://github.com/addozhang/CopilotQuota/releases/latest)，
-把 `Copilot Quota.app` 拖入「应用程序」，然后放行一次 Gatekeeper：
+把 `Copilot Quota.app` 拖入「应用程序」直接打开——App 已使用 **Developer ID
+证书签名并通过 Apple 公证**，首次打开无需任何 Gatekeeper 放行操作。
+
+可自行校验签名：
 
 ```bash
-xattr -dr com.apple.quarantine "/Applications/Copilot Quota.app"
+spctl -a -t exec -vv "/Applications/Copilot Quota.app"
+# → accepted, source=Notarized Developer ID
 ```
 
-（或者：系统设置 → 隐私与安全性 → **仍要打开**。）
 需要 macOS 14+ · Universal 双架构（Apple Silicon 和 Intel）。
 
 ## 使用
