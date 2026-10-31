@@ -42,7 +42,15 @@ if echo "$SIGN_INFO" | grep -q "Authority=Developer ID Application"; then
 
   if xcrun notarytool history --keychain-profile "$NOTARY_PROFILE" >/dev/null 2>&1; then
     echo "==> 4. Submitting to Apple Notary Service (profile: $NOTARY_PROFILE)..."
-    xcrun notarytool submit "$ZIP_PATH" --keychain-profile "$NOTARY_PROFILE" --wait
+    SUBMIT_JSON="$(xcrun notarytool submit "$ZIP_PATH" --keychain-profile "$NOTARY_PROFILE" --wait --output-format json)"
+    STATUS="$(sed -n 's/.*"status" *: *"\([A-Za-z]*\)".*/\1/p' <<<"$SUBMIT_JSON" | head -n1)"
+    SUBMIT_ID="$(sed -n 's/.*"id" *: *"\([^"]*\)".*/\1/p' <<<"$SUBMIT_JSON" | head -n1)"
+
+    if [[ "$STATUS" != "Accepted" ]]; then
+      echo "❌ Notarization failed with status: ${STATUS:-unknown} (submission: ${SUBMIT_ID:-?})"
+      echo "    Details: xcrun notarytool log ${SUBMIT_ID:-<id>} --keychain-profile \"$NOTARY_PROFILE\""
+      exit 1
+    fi
 
     echo "==> 5. Stapling notarization ticket to $APP_NAME.app..."
     xcrun stapler staple "$APP_PATH"

@@ -37,6 +37,9 @@ XCODEBUILD_ARGS=(
   ARCHS="arm64 x86_64"
   ONLY_ACTIVE_ARCH=NO
   ENABLE_HARDENED_RUNTIME=YES   # required for notarization
+  ENABLE_TESTABILITY=NO         # no get-task-allow — notarization rejects it
+  CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO
+  OTHER_CODE_SIGN_FLAGS="--timestamp"   # secure timestamp — notarization requires it
 )
 
 if [[ "$SIGNING_IDENTITY" == "-" ]]; then
