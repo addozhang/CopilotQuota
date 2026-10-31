@@ -10,7 +10,7 @@
 
 ## 安装
 
-下载并解压 [CopilotQuota-v1.0.0.zip](https://github.com/addozhang/CopilotQuota/releases/latest)，
+下载并解压 [最新版本](https://github.com/addozhang/CopilotQuota/releases/latest)，
 把 `Copilot Quota.app` 拖入「应用程序」，然后放行一次 Gatekeeper：
 
 ```bash
@@ -41,6 +41,8 @@ xcodebuild -project CopilotQuota.xcodeproj -target CopilotQuota -configuration R
   用设备流程拿到的 token 拉取。
 - token（scope 仅 `read:user`）不出本机。widget 刷新受系统每日预算限制，
   所选间隔只是下限。
-- widget 扩展已沙盒化，通过偏好域只读例外共享数据——个人使用没问题，未按上架要求做。
+- widget 扩展已沙盒化，通过偏好域读写例外共享数据与 token，App 未运行时
+  widget 可自行轮换约 8 小时寿命的 OAuth token——个人使用 / Developer ID
+  分发没问题；上架 Mac App Store 需改为 App Group 方案（商店拒绝临时例外权限）。
 - 退出登录 / 手动刷新在 App 里。界面支持英文和简体中文，跟随系统语言。
 - Copilot 图标基于 GitHub [Octicons](https://github.com/primer/octicons)（MIT）。

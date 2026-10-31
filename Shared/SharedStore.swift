@@ -3,9 +3,10 @@ import Foundation
 /// Values shared between the host app and the widget extension.
 ///
 /// The host app is unsandboxed and writes the plain preference domain
-/// `com.addo.copilotquota`; the sandboxed widget extension reads that same
-/// domain via a `temporary-exception.shared-preference.read-only` grant
-/// (see CopilotQuotaWidget.entitlements).
+/// `com.addo.copilotquota`; the sandboxed widget extension accesses that
+/// same domain via a `temporary-exception.shared-preference.read-write`
+/// grant (see CopilotQuotaWidget.entitlements) so it can persist rotated
+/// token pairs and fresh quota while the app is not running.
 enum SharedStore {
     static let suiteName = "com.addo.copilotquota"
 
@@ -60,8 +61,11 @@ enum SharedStore {
     }
 
     /// Persist a full token pair (access + refresh + expiry) in one go.
-    /// (Plain values, not a GitHubDeviceFlow.TokenPair, because the widget
-    /// target compiles this file but not GitHubDeviceFlow.swift.)
+    /// May be called by BOTH the host app and the widget — the widget
+    /// rotates the pair itself when the app has not been running past the
+    /// token's ~8h lifetime (see TokenManager for the race protocol).
+    /// (Plain values, not a GitHubDeviceFlow.TokenPair, to keep this file
+    /// dependency-free.)
     static func storeTokenPair(accessToken: String, refreshToken: String?, expiresInSeconds: Int) {
         token = accessToken
         self.refreshToken = refreshToken
@@ -85,6 +89,21 @@ enum SharedStore {
                 defaults.set(data, forKey: "cachedDisplay")
             } else {
                 defaults.removeObject(forKey: "cachedDisplay")
+            }
+        }
+    }
+
+    /// When the host app last refreshed (its timer ticks at the shared
+    /// interval). The widget reads this to decide whether the app is alive:
+    /// while it is, the app owns fetching AND token renewal; once it goes
+    /// stale, the widget starts rotating the token pair itself.
+    static var appHeartbeat: Date? {
+        get { defaults.object(forKey: "appHeartbeat") as? Date }
+        set {
+            if let newValue {
+                defaults.set(newValue, forKey: "appHeartbeat")
+            } else {
+                defaults.removeObject(forKey: "appHeartbeat")
             }
         }
     }

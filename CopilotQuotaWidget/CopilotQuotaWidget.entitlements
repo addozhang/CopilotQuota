@@ -6,10 +6,13 @@
 	<true/>
 	<key>com.apple.security.network.client</key>
 	<true/>
-	<!-- Read-only access to the preference domain the (unsandboxed) host app
-	     writes the GitHub token / cached quota into. Works for ad-hoc or
-	     Developer ID distribution; not allowed on the Mac App Store. -->
-	<key>com.apple.security.temporary-exception.shared-preference.read-only</key>
+	<!-- Read-write access to the preference domain the (unsandboxed) host app
+	     shares the GitHub token / cached quota in. The widget needs WRITE
+	     access to persist rotated token pairs and freshly fetched quota when
+	     the host app is not running (rotation races are coordinated via the
+	     app heartbeat + retry in TokenManager). Works for ad-hoc or Developer
+	     ID distribution; not allowed on the Mac App Store. -->
+	<key>com.apple.security.temporary-exception.shared-preference.read-write</key>
 	<array>
 		<string>com.addo.copilotquota</string>
 	</array>

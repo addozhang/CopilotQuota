@@ -11,7 +11,7 @@ battery-widget style: a ring, the Copilot glyph, and a percentage.
 
 ## Install
 
-Download and unzip [CopilotQuota-v1.0.0.zip](https://github.com/addozhang/CopilotQuota/releases/latest),
+Download and unzip [the latest release](https://github.com/addozhang/CopilotQuota/releases/latest),
 drag `Copilot Quota.app` into **/Applications**, then allow Gatekeeper once:
 
 ```bash
@@ -43,7 +43,10 @@ xcodebuild -project CopilotQuota.xcodeproj -target CopilotQuota -configuration R
   (premium → chat → completions), fetched with the token from the device flow.
 - The token (scope `read:user`) never leaves this machine. Widget refreshes are
   capped by the system's daily widget budget, so the chosen interval is a lower bound.
-- The widget extension is sandboxed; data is shared through a preference-domain
-  read-only exception — fine for personal use, not App Store ready.
+- The widget extension is sandboxed; data and tokens are shared through a
+  preference-domain read-write exception, so the widget can rotate the ~8h
+  OAuth token itself while the app is closed — fine for personal use and
+  Developer ID distribution, not App Store ready (the store rejects
+  temporary-exception entitlements).
 - Sign out / refresh live in the app. UI is English + 简体中文, follows the system language.
 - The Copilot glyph is based on GitHub [Octicons](https://github.com/primer/octicons) (MIT).

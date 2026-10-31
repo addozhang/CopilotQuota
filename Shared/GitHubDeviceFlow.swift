@@ -1,4 +1,7 @@
 import Foundation
+import os
+
+private let tokenLog = Logger(subsystem: "com.addo.copilotquota", category: "token")
 
 enum DeviceFlowError: LocalizedError {
     case network
@@ -216,16 +219,29 @@ struct GitHubDeviceFlow {
 
 // MARK: - TokenManager
 
-/// Token lifecycle for the host app: proactive refresh based on the stored
-/// expiry, with a 401-triggered forced refresh as fallback.
+/// Token lifecycle, shared by the host app and the widget.
 ///
-/// IMPORTANT: only the host app may run refreshes. The widget reads the
-/// shared preference domain read-only (entitlements) and every refresh
-/// ROTATES the stored refresh token — a widget-side refresh that cannot
-/// persist the new token would silently log the user out.
+/// GitHub's refresh token ROTATES on every use — the response carries a new
+/// pair and the old refresh token dies instantly. Since both the app and the
+/// widget can reach the ~8h token expiry while the other is mid-refresh, all
+/// rotations go through `validToken`'s race protocol:
+///
+/// 1. Normally only one side rotates at a time: the app advertises liveness
+///    via `SharedStore.appHeartbeat`, and the widget only rotates when that
+///    heartbeat has gone stale (app not running).
+/// 2. If a race slips through anyway (e.g. the app launches exactly while
+///    the widget is rotating), the loser's refresh call fails — it then
+///    re-reads the stored refresh token ONCE and retries with the rotated
+///    value before concluding the token is actually dead.
+/// 3. Only `mayClearCredentials` callers (the host app) ever sign the user
+///    out; the widget just falls back to its cache and lets the app decide.
 enum TokenManager {
-    /// Refresh this early before the actual expiry, to avoid racing the clock.
-    private static let refreshMargin: TimeInterval = 5 * 60
+    /// Refresh this early before the actual expiry. Generous (1h) on
+    /// purpose: the widget's timeline reloads are budget-spaced 15–60 min
+    /// apart, so a small margin would let the ~8h token die between
+    /// reloads. Rotating early costs nothing — it is still one rotation
+    /// per ~8h, just scheduled before the cliff instead of after it.
+    private static let refreshMargin: TimeInterval = 60 * 60
 
     enum Error: LocalizedError {
         case signedOut
@@ -244,10 +260,13 @@ enum TokenManager {
     ///   missing or within `refreshMargin`. If there is no refresh token
     ///   (a legacy login from before auto-refresh existed), the possibly-stale
     ///   access token is returned as-is and the caller's 401 path recovers.
+    /// - `mayClearCredentials`: pass false from the widget — a dead refresh
+    ///   token there must NOT sign the user out of the app.
     /// - Throws `QuotaError.unauthorized` when the refresh token itself is
-    ///   dead — in that case credentials are cleared and the user must
-    ///   re-authorize (refresh tokens live ~6 months).
-    static func validToken(forceRefresh: Bool = false) async throws -> String {
+    ///   dead — in that case (app-side) credentials are cleared and the user
+    ///   must re-authorize (refresh tokens live ~6 months).
+    static func validToken(forceRefresh: Bool = false,
+                           mayClearCredentials: Bool = true) async throws -> String {
         guard let storedToken = SharedStore.token else { throw Error.signedOut }
 
         let needsRefresh: Bool
@@ -264,19 +283,43 @@ enum TokenManager {
         }
 
         do {
-            let pair = try await GitHubDeviceFlow().refreshTokens(refreshToken: refreshToken)
-            SharedStore.storeTokenPair(accessToken: pair.accessToken,
-                                       refreshToken: pair.refreshToken,
-                                       expiresInSeconds: pair.expiresInSeconds)
-            return pair.accessToken
+            let token = try await rotate(refreshToken: refreshToken)
+            tokenLog.info("token rotated, new access token valid ~\(8 * 3600, privacy: .public)s")
+            return token
         } catch {
-            // Rotated/expired/revoked refresh token: force re-login.
-            SharedStore.clearCredentials()
+            // Rotation race: the other process may have consumed and rotated
+            // this exact refresh token between our read and GitHub's
+            // response. Re-read once and retry with whatever is stored now
+            // before declaring the token dead.
+            let latest = SharedStore.refreshToken
+            if let latest, latest != refreshToken {
+                tokenLog.info("rotation raced — retrying with re-read refresh token")
+                if let token = try? await rotate(refreshToken: latest) {
+                    return token
+                }
+            }
+            if mayClearCredentials {
+                tokenLog.error("refresh token dead — clearing credentials, sign-in required")
+                SharedStore.clearCredentials() // truly dead — force re-login
+            } else {
+                tokenLog.error("refresh token dead (widget side) — falling back to cache")
+            }
             throw QuotaError.unauthorized
         }
     }
 
+    /// One refresh-grant round trip, persisting the rotated pair.
+    private static func rotate(refreshToken: String) async throws -> String {
+        let pair = try await GitHubDeviceFlow().refreshTokens(refreshToken: refreshToken)
+        SharedStore.storeTokenPair(accessToken: pair.accessToken,
+                                   refreshToken: pair.refreshToken,
+                                   expiresInSeconds: pair.expiresInSeconds)
+        return pair.accessToken
+    }
+
     /// Fetch the quota with automatic token refresh and one 401 retry.
+    /// (Host app only — the widget calls validToken/fetch directly and does
+    /// NOT force-refresh on 401, to avoid rotation churn against the app.)
     static func fetchQuota() async throws -> CopilotUserResponse {
         let client = CopilotQuotaClient()
         let token = try await validToken()

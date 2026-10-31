@@ -1,9 +1,14 @@
 import SwiftUI
 import AppKit
 import WidgetKit
+import os
+
+private let logger = Logger(subsystem: "com.addo.copilotquota", category: "app")
 
 struct ContentView: View {
-    @StateObject private var model = AppModel()
+    // Owned by the App scene so the auto-refresh timer survives closing
+    // the window (the app process keeps running until Cmd-Q).
+    @EnvironmentObject var model: AppModel
 
     var body: some View {
         Group {
@@ -29,16 +34,58 @@ final class AppModel: ObservableObject {
     @Published var refreshInterval = 30
 
     private var refreshTimer: Timer?
+    // Block-based observers; AppModel lives for the app's whole lifetime,
+    // so they are never unregistered (process teardown cleans up).
+    private var observers: [NSObjectProtocol] = []
+
+    init() {
+        // Start refreshing at app launch (not first window open) — the token
+        // expires ~8h after the last app-side refresh, and once it does the
+        // widget's own fetches all fail with 401. Keeping the app running
+        // (even with no window) keeps the token and the widget alive.
+        load()
+        // Timers don't fire while the Mac sleeps, and App Nap can coalesce
+        // them when the window is occluded — a repeating timer can sit up to
+        // a full interval behind. Catch up the moment the system wakes or
+        // the user returns to the app.
+        let wakeCenter = NSWorkspace.shared.notificationCenter
+        observers.append(wakeCenter.addObserver(
+            forName: NSWorkspace.didWakeNotification, object: nil, queue: .main) { [weak self] _ in
+            Task { @MainActor in await self?.refreshIfStale(reason: "wake") }
+        })
+        observers.append(NotificationCenter.default.addObserver(
+            forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in
+            Task { @MainActor in await self?.refreshIfStale(reason: "app-active") }
+        })
+    }
 
     func load() {
         token = SharedStore.token
         display = SharedStore.cachedDisplay
         refreshInterval = SharedStore.refreshIntervalMinutes
         startAutoRefresh()
+        // Fetch immediately instead of waiting a full interval — the cached
+        // "Updated at" can be a day old if the app hasn't run since.
+        if token != nil {
+            Task { await refresh(silent: display != nil) }
+        }
         // Push a fresh timeline after app updates — otherwise the system may
         // keep rendering the stale widget snapshot (old layout/data) until the
         // next scheduled reload lands.
         WidgetCenter.shared.reloadAllTimelines()
+    }
+
+    /// The interval timer can miss beats (sleep, App Nap). When the system
+    /// wakes or the app comes back to the front, refresh right away if the
+    /// cache is older than one interval.
+    func refreshIfStale(reason: String) async {
+        guard token != nil else { return }
+        let interval = TimeInterval(SharedStore.refreshIntervalMinutes * 60)
+        if let fetchedAt = display?.fetchedAt, Date().timeIntervalSince(fetchedAt) < interval {
+            return
+        }
+        logger.info("refresh (\(reason, privacy: .public)): cache older than interval")
+        await refresh(silent: true)
     }
 
     /// While the app is open, poll at the chosen interval — networking from the
@@ -64,6 +111,10 @@ final class AppModel: ObservableObject {
 
     func refresh(silent: Bool = false) async {
         guard token != nil else { return }
+        guard !isRefreshing else { return } // load() can fire twice at launch
+        // Advertise liveness so the widget leaves fetching/token rotation to
+        // us while the app is running (see QuotaProvider.appIsAlive).
+        SharedStore.appHeartbeat = Date()
         isRefreshing = !silent
         errorText = nil
         defer { isRefreshing = false }
@@ -74,18 +125,22 @@ final class AppModel: ObservableObject {
             }
             self.display = display
             SharedStore.cachedDisplay = display
+            logger.info("refresh ok: \(display.primaryCategoryLabel, privacy: .public) \(display.percentRemaining, format: .fixed(precision: 0), privacy: .public)%")
             WidgetCenter.shared.reloadAllTimelines()
         } catch QuotaError.unauthorized where SharedStore.token == nil {
             // Refresh token died — TokenManager already cleared credentials.
+            logger.error("signed out: refresh token rejected")
             token = nil
         } catch {
             errorText = (error as? QuotaError)?.errorDescription ?? error.localizedDescription
+            logger.error("refresh failed: \(error.localizedDescription, privacy: .public)")
         }
     }
 
     func signOut() {
         SharedStore.clearCredentials()
         SharedStore.cachedDisplay = nil
+        SharedStore.appHeartbeat = nil
         token = nil
         display = nil
         errorText = nil

@@ -22,6 +22,7 @@
 		AA0000000000000000000083 /* SharedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000063 /* SharedStore.swift */; };
 		AA0000000000000000000084 /* CopilotIconShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000064 /* CopilotIconShape.swift */; };
 		AA0000000000000000000085 /* QuotaRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000065 /* QuotaRingView.swift */; };
+		AA0000000000000000000086 /* GitHubDeviceFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000062 /* GitHubDeviceFlow.swift */; };
 		AA0000000000000000000090 /* CopilotQuotaWidget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000054 /* CopilotQuotaWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		AA0000000000000000000095 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000046 /* Assets.xcassets */; };
 		AA0000000000000000000099 /* L10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000066 /* L10n.swift */; };
@@ -282,6 +283,7 @@
 				AA0000000000000000000083 /* SharedStore.swift in Sources */,
 				AA0000000000000000000084 /* CopilotIconShape.swift in Sources */,
 				AA0000000000000000000085 /* QuotaRingView.swift in Sources */,
+				AA0000000000000000000086 /* GitHubDeviceFlow.swift in Sources */,
 				AA000000000000000000009A /* L10n.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -355,7 +357,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = NO;
 				ENABLE_PREVIEWS = YES;
@@ -368,7 +370,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.addo.copilotquota;
 				PRODUCT_NAME = "Copilot Quota";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -380,7 +382,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = NO;
 				ENABLE_PREVIEWS = YES;
@@ -393,7 +395,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.addo.copilotquota;
 				PRODUCT_NAME = "Copilot Quota";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -405,7 +407,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				CODE_SIGN_ENTITLEMENTS = CopilotQuotaWidget/CopilotQuotaWidget.entitlements;
 				ENABLE_APP_SANDBOX = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -414,7 +416,7 @@
 					"$(inherited)",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.addo.copilotquota.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -428,7 +430,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				CODE_SIGN_ENTITLEMENTS = CopilotQuotaWidget/CopilotQuotaWidget.entitlements;
 				ENABLE_APP_SANDBOX = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -437,7 +439,7 @@
 					"$(inherited)",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.addo.copilotquota.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
