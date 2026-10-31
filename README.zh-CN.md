@@ -35,6 +35,17 @@ xattr -dr com.apple.quarantine "/Applications/Copilot Quota.app"
 xcodebuild -project CopilotQuota.xcodeproj -target CopilotQuota -configuration Release build SYMROOT=build
 ```
 
+## 发布
+
+```bash
+./scripts/release.sh
+```
+
+构建 universal Release 产物：检测到 **Developer ID Application** 证书则正式
+签名（否则 ad-hoc），存在 `solocraft-notary` keychain profile 时自动提交
+Apple 公证并装订票据（一次性配置见脚本头部说明），产出
+`build/CopilotQuota-<版本>.zip` + `.dmg`。
+
 ## 说明
 
 - 配额来自 `api.github.com/copilot_internal/user`（premium → chat → completions），

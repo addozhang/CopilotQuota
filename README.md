@@ -37,6 +37,18 @@ Open `CopilotQuota.xcodeproj` and run (`⌘R`), or:
 xcodebuild -project CopilotQuota.xcodeproj -target CopilotQuota -configuration Release build SYMROOT=build
 ```
 
+## Release
+
+```bash
+./scripts/release.sh
+```
+
+Builds a universal Release app, signs it with the **Developer ID Application**
+certificate when one is available (ad-hoc otherwise), submits it to Apple
+notarization when the `solocraft-notary` keychain profile exists (see the
+script header for one-time setup), staples the ticket, and produces
+`build/CopilotQuota-<version>.zip` + `.dmg`.
+
 ## Notes
 
 - Quota comes from `api.github.com/copilot_internal/user`
