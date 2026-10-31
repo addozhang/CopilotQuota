@@ -2,7 +2,7 @@ import WidgetKit
 import SwiftUI
 import os
 
-private let widgetLog = Logger(subsystem: "com.addo.copilotquota", category: "widget")
+private let widgetLog = Logger(subsystem: "app.solocraft.copilotquota", category: "widget")
 
 struct QuotaEntry: TimelineEntry {
     let date: Date
@@ -126,7 +126,7 @@ struct CopilotQuotaEntryView: View {
 
 struct CopilotQuotaWidget: Widget {
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: "com.addo.copilotquota.quota", provider: QuotaProvider()) { entry in
+        StaticConfiguration(kind: "app.solocraft.copilotquota.quota", provider: QuotaProvider()) { entry in
             CopilotQuotaEntryView(entry: entry)
         }
         .configurationDisplayName("Copilot Quota")

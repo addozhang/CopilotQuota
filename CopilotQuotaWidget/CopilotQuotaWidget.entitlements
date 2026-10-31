@@ -6,14 +6,18 @@
 	<true/>
 	<key>com.apple.security.network.client</key>
 	<true/>
-	<!-- Read-write access to the preference domain the (unsandboxed) host app
-	     shares the GitHub token / cached quota in. The widget needs WRITE
-	     access to persist rotated token pairs and freshly fetched quota when
-	     the host app is not running (rotation races are coordinated via the
-	     app heartbeat + retry in TokenManager). Works for ad-hoc or Developer
-	     ID distribution; not allowed on the Mac App Store. -->
+	<!-- Read-write access to the preference domains shared with the
+	     (unsandboxed) host app. The widget needs WRITE access to persist
+	     rotated token pairs and freshly fetched quota while the host app
+	     is not running (rotation races are coordinated via the app
+	     heartbeat + retry in TokenManager). app.solocraft.copilotquota is
+	     the live domain; com.addo.copilotquota is the pre-rebrand domain,
+	     listed only for the one-time v1.3.x store migration — drop it in
+	     a later release. Works for ad-hoc or Developer ID distribution;
+	     not allowed on the Mac App Store. -->
 	<key>com.apple.security.temporary-exception.shared-preference.read-write</key>
 	<array>
+		<string>app.solocraft.copilotquota</string>
 		<string>com.addo.copilotquota</string>
 	</array>
 </dict>

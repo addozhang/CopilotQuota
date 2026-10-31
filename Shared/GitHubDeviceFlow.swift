@@ -1,7 +1,7 @@
 import Foundation
 import os
 
-private let tokenLog = Logger(subsystem: "com.addo.copilotquota", category: "token")
+private let tokenLog = Logger(subsystem: "app.solocraft.copilotquota", category: "token")
 
 enum DeviceFlowError: LocalizedError {
     case network

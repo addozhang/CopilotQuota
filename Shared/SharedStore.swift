@@ -3,15 +3,44 @@ import Foundation
 /// Values shared between the host app and the widget extension.
 ///
 /// The host app is unsandboxed and writes the plain preference domain
-/// `com.addo.copilotquota`; the sandboxed widget extension accesses that
-/// same domain via a `temporary-exception.shared-preference.read-write`
+/// `app.solocraft.copilotquota`; the sandboxed widget extension accesses
+/// that same domain via a `temporary-exception.shared-preference.read-write`
 /// grant (see CopilotQuotaWidget.entitlements) so it can persist rotated
-/// token pairs and fresh quota while the app is not running.
+/// token pairs and fresh quota while the app is not running. The legacy
+/// `com.addo.copilotquota` domain is listed too, for the one-time v1.3.x
+/// migration.
 enum SharedStore {
-    static let suiteName = "com.addo.copilotquota"
+    static let suiteName = "app.solocraft.copilotquota"
+    /// Pre-rebrand preference domain. Migrated once on first run.
+    private static let legacySuiteName = "com.addo.copilotquota"
+    private static let legacyMigratedKey = "legacyStoreMigrated"
+    private static let legacyKeys = ["githubToken", "githubRefreshToken",
+                                     "githubTokenExpiresAt", "cachedDisplay",
+                                     "refreshIntervalMinutes"]
+    private static var migrationChecked = false
 
     private static var defaults: UserDefaults {
-        UserDefaults(suiteName: suiteName) ?? .standard
+        migrateLegacyStoreIfNeeded()
+        return UserDefaults(suiteName: suiteName) ?? .standard
+    }
+
+    /// One-time carry-over of token/cache/settings from the pre-rebrand
+    /// domain, so updating users don't sign in again. The marker key lives
+    /// in the NEW domain and is set before copying — a later sign-out can
+    /// never resurrect the legacy token. Idempotent; safe from either
+    /// process (UserDefaults itself is thread-safe).
+    static func migrateLegacyStoreIfNeeded() {
+        guard !migrationChecked else { return }
+        migrationChecked = true
+        let store = UserDefaults(suiteName: suiteName) ?? .standard
+        guard !store.bool(forKey: legacyMigratedKey) else { return }
+        store.set(true, forKey: legacyMigratedKey)
+        guard let legacy = UserDefaults(suiteName: legacySuiteName) else { return }
+        for key in legacyKeys {
+            if let value = legacy.object(forKey: key) {
+                store.set(value, forKey: key)
+            }
+        }
     }
 
     static var token: String? {

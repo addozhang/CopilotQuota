@@ -3,7 +3,7 @@ import AppKit
 import WidgetKit
 import os
 
-private let logger = Logger(subsystem: "com.addo.copilotquota", category: "app")
+private let logger = Logger(subsystem: "app.solocraft.copilotquota", category: "app")
 
 struct ContentView: View {
     // Owned by the App scene so the auto-refresh timer survives closing
