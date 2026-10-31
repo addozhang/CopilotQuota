@@ -10,8 +10,8 @@
 
 ## 安装
 
-下载并解压 [最新版本](https://github.com/addozhang/CopilotQuota/releases/latest)，
-把 `Copilot Quota.app` 拖入「应用程序」直接打开——App 已使用 **Developer ID
+下载 [最新版本](https://github.com/addozhang/CopilotQuota/releases/latest) 的 DMG，
+打开并把 `Copilot Quota.app` 拖入「应用程序」——App 已使用 **Developer ID
 证书签名并通过 Apple 公证**，首次打开无需任何 Gatekeeper 放行操作。
 
 可自行校验签名：

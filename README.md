@@ -11,8 +11,8 @@ battery-widget style: a ring, the Copilot glyph, and a percentage.
 
 ## Install
 
-Download and unzip [the latest release](https://github.com/addozhang/CopilotQuota/releases/latest),
-drag `Copilot Quota.app` into **/Applications** and open it — the app is
+Download [the latest release](https://github.com/addozhang/CopilotQuota/releases/latest)
+(DMG), open it and drag `Copilot Quota.app` into **/Applications** — the app is
 signed with a **Developer ID certificate and notarized by Apple**, so
 Gatekeeper lets it through on first launch. No workarounds needed.
 
