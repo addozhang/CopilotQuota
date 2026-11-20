@@ -2,6 +2,8 @@
 
 **[English](README.md)** | 简体中文
 
+**[官网](https://solocraft.app/copilot-quota) · [下载 DMG](https://github.com/addozhang/CopilotQuota/releases/latest)**
+
 仿系统电池样式的 macOS 桌面小组件（WidgetKit）：一个圆环 + Copilot 图标 + 剩余百分比。
 
 | 桌面小组件 | App |

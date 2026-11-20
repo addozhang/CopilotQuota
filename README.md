@@ -2,6 +2,8 @@
 
 English | **[简体中文](README.zh-CN.md)**
 
+**[Website](https://solocraft.app/copilot-quota) · [Download DMG](https://github.com/addozhang/CopilotQuota/releases/latest)**
+
 A macOS desktop widget (WidgetKit) that shows your remaining GitHub Copilot quota —
 battery-widget style: a ring, the Copilot glyph, and a percentage.
 
