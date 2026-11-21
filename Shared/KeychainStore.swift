@@ -9,10 +9,16 @@ private let keychainLog = Logger(subsystem: "app.solocraft.copilotquota", catego
 /// Storing access token, rotating refresh token, and expiry together in a
 /// single Keychain item ensures updates from either the host app or widget
 /// are atomic.
-struct StoredCredentials: Codable, Equatable {
-    var accessToken: String
-    var refreshToken: String?
-    var expiresAt: Date?
+public struct StoredCredentials: Codable, Equatable, Sendable {
+    public var accessToken: String
+    public var refreshToken: String?
+    public var expiresAt: Date?
+
+    public init(accessToken: String, refreshToken: String?, expiresAt: Date?) {
+        self.accessToken = accessToken
+        self.refreshToken = refreshToken
+        self.expiresAt = expiresAt
+    }
 }
 
 /// Persistence interface for OAuth credentials (Keychain in production,

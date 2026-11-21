@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "AA0000000000000000000020"
-               BuildableName = "Copilot Quota.app"
+               BuildableName = "QuotaRing.app"
                BlueprintName = "CopilotQuota"
                ReferencedContainer = "container:CopilotQuota.xcodeproj">
             </BuildableReference>

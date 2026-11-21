@@ -46,6 +46,33 @@
 		AA0000000000000000000128 /* L10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000066 /* L10n.swift */; };
 		AA0000000000000000000129 /* AppInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000049 /* AppInfo.swift */; };
 		AA000000000000000000012A /* UpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000102 /* UpdateChecker.swift */; };
+		AA0000000000000000000221 /* QuotaCoreModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000201 /* QuotaCoreModels.swift */; };
+		AA0000000000000000000222 /* ProviderGlyphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000202 /* ProviderGlyphView.swift */; };
+		AA0000000000000000000223 /* KeychainVault.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000203 /* KeychainVault.swift */; };
+		AA0000000000000000000224 /* SharedSnapshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000204 /* SharedSnapshotStore.swift */; };
+		AA0000000000000000000225 /* AddProviderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000205 /* AddProviderView.swift */; };
+		AA0000000000000000000226 /* QuotaProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000206 /* QuotaProvider.swift */; };
+		AA0000000000000000000227 /* CopilotProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000207 /* CopilotProvider.swift */; };
+		AA0000000000000000000228 /* DeepSeekProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000208 /* DeepSeekProvider.swift */; };
+		AA0000000000000000000229 /* OpenRouterProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000209 /* OpenRouterProvider.swift */; };
+		AA000000000000000000022A /* GLMProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000020A /* GLMProvider.swift */; };
+		AA000000000000000000022B /* QuotaCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000020B /* QuotaCoordinator.swift */; };
+		AA0000000000000000000231 /* QuotaCoreModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000201 /* QuotaCoreModels.swift */; };
+		AA0000000000000000000232 /* ProviderGlyphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000202 /* ProviderGlyphView.swift */; };
+		AA0000000000000000000233 /* SharedSnapshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000204 /* SharedSnapshotStore.swift */; };
+		AA0000000000000000000241 /* QuotaCoreModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000201 /* QuotaCoreModels.swift */; };
+		AA0000000000000000000242 /* KeychainVault.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000203 /* KeychainVault.swift */; };
+		AA0000000000000000000243 /* SharedSnapshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000204 /* SharedSnapshotStore.swift */; };
+		AA0000000000000000000244 /* QuotaProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000206 /* QuotaProvider.swift */; };
+		AA0000000000000000000245 /* CopilotProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000207 /* CopilotProvider.swift */; };
+		AA0000000000000000000246 /* DeepSeekProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000208 /* DeepSeekProvider.swift */; };
+		AA0000000000000000000247 /* OpenRouterProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000209 /* OpenRouterProvider.swift */; };
+		AA0000000000000000000248 /* GLMProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000020A /* GLMProvider.swift */; };
+		AA0000000000000000000249 /* QuotaCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000020B /* QuotaCoordinator.swift */; };
+		AA000000000000000000024A /* LaunchAtLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000103 /* LaunchAtLogin.swift */; };
+		AA000000000000000000024C /* QuotaCoreModelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000020C /* QuotaCoreModelsTests.swift */; };
+		AA000000000000000000024D /* ProvidersDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000020D /* ProvidersDecodingTests.swift */; };
+		AA000000000000000000024E /* VaultAndCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000020E /* VaultAndCoordinatorTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -81,7 +108,7 @@
 		AA0000000000000000000043 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AA0000000000000000000046 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AA0000000000000000000047 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
-		AA0000000000000000000044 /* Copilot Quota.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Copilot Quota.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA0000000000000000000044 /* QuotaRing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = QuotaRing.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA0000000000000000000050 /* CopilotQuotaWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopilotQuotaWidget.swift; sourceTree = "<group>"; };
 		AA0000000000000000000053 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AA0000000000000000000055 /* CopilotQuotaWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CopilotQuotaWidget.entitlements; sourceTree = "<group>"; };
@@ -100,6 +127,20 @@
 		AA0000000000000000000105 /* UpdateCheckerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCheckerTests.swift; sourceTree = "<group>"; };
 		AA0000000000000000000106 /* TokenManagerAndStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenManagerAndStoreTests.swift; sourceTree = "<group>"; };
 		AA0000000000000000000107 /* CopilotQuotaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CopilotQuotaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA0000000000000000000201 /* QuotaCoreModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaCoreModels.swift; sourceTree = "<group>"; };
+		AA0000000000000000000202 /* ProviderGlyphView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderGlyphView.swift; sourceTree = "<group>"; };
+		AA0000000000000000000203 /* KeychainVault.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainVault.swift; sourceTree = "<group>"; };
+		AA0000000000000000000204 /* SharedSnapshotStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedSnapshotStore.swift; sourceTree = "<group>"; };
+		AA0000000000000000000205 /* AddProviderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddProviderView.swift; sourceTree = "<group>"; };
+		AA0000000000000000000206 /* QuotaProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaProvider.swift; sourceTree = "<group>"; };
+		AA0000000000000000000207 /* CopilotProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopilotProvider.swift; sourceTree = "<group>"; };
+		AA0000000000000000000208 /* DeepSeekProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepSeekProvider.swift; sourceTree = "<group>"; };
+		AA0000000000000000000209 /* OpenRouterProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenRouterProvider.swift; sourceTree = "<group>"; };
+		AA000000000000000000020A /* GLMProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GLMProvider.swift; sourceTree = "<group>"; };
+		AA000000000000000000020B /* QuotaCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaCoordinator.swift; sourceTree = "<group>"; };
+		AA000000000000000000020C /* QuotaCoreModelsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaCoreModelsTests.swift; sourceTree = "<group>"; };
+		AA000000000000000000020D /* ProvidersDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProvidersDecodingTests.swift; sourceTree = "<group>"; };
+		AA000000000000000000020E /* VaultAndCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaultAndCoordinatorTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -151,8 +192,10 @@
 		AA0000000000000000000012 /* CopilotQuota */ = {
 			isa = PBXGroup;
 			children = (
+				AA0000000000000000000210 /* Providers */,
 				AA0000000000000000000040 /* CopilotQuotaApp.swift */,
 				AA0000000000000000000041 /* ContentView.swift */,
+				AA0000000000000000000205 /* AddProviderView.swift */,
 				AA0000000000000000000042 /* DeviceFlowView.swift */,
 				AA0000000000000000000043 /* Info.plist */,
 				AA0000000000000000000046 /* Assets.xcassets */,
@@ -162,6 +205,19 @@
 				AA0000000000000000000103 /* LaunchAtLogin.swift */,
 			);
 			path = CopilotQuota;
+			sourceTree = "<group>";
+		};
+		AA0000000000000000000210 /* Providers */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000000000000000000206 /* QuotaProvider.swift */,
+				AA0000000000000000000207 /* CopilotProvider.swift */,
+				AA0000000000000000000208 /* DeepSeekProvider.swift */,
+				AA0000000000000000000209 /* OpenRouterProvider.swift */,
+				AA000000000000000000020A /* GLMProvider.swift */,
+				AA000000000000000000020B /* QuotaCoordinator.swift */,
+			);
+			path = Providers;
 			sourceTree = "<group>";
 		};
 		AA0000000000000000000013 /* CopilotQuotaWidget */ = {
@@ -177,6 +233,10 @@
 		AA0000000000000000000014 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				AA0000000000000000000201 /* QuotaCoreModels.swift */,
+				AA0000000000000000000202 /* ProviderGlyphView.swift */,
+				AA0000000000000000000203 /* KeychainVault.swift */,
+				AA0000000000000000000204 /* SharedSnapshotStore.swift */,
 				AA0000000000000000000060 /* QuotaModels.swift */,
 				AA0000000000000000000061 /* CopilotQuotaClient.swift */,
 				AA0000000000000000000062 /* GitHubDeviceFlow.swift */,
@@ -196,6 +256,9 @@
 				AA0000000000000000000104 /* QuotaModelsTests.swift */,
 				AA0000000000000000000105 /* UpdateCheckerTests.swift */,
 				AA0000000000000000000106 /* TokenManagerAndStoreTests.swift */,
+				AA000000000000000000020C /* QuotaCoreModelsTests.swift */,
+				AA000000000000000000020D /* ProvidersDecodingTests.swift */,
+				AA000000000000000000020E /* VaultAndCoordinatorTests.swift */,
 			);
 			path = CopilotQuotaTests;
 			sourceTree = "<group>";
@@ -218,7 +281,7 @@
 				AA0000000000000000000023 /* PBXTargetDependency */,
 			);
 			name = CopilotQuota;
-			productName = "Copilot Quota";
+			productName = QuotaRing;
 			productReference = AA0000000000000000000044 /* Copilot Quota.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -321,7 +384,18 @@
 			files = (
 				AA0000000000000000000070 /* CopilotQuotaApp.swift in Sources */,
 				AA0000000000000000000071 /* ContentView.swift in Sources */,
+				AA0000000000000000000225 /* AddProviderView.swift in Sources */,
 				AA0000000000000000000072 /* DeviceFlowView.swift in Sources */,
+				AA0000000000000000000221 /* QuotaCoreModels.swift in Sources */,
+				AA0000000000000000000222 /* ProviderGlyphView.swift in Sources */,
+				AA0000000000000000000223 /* KeychainVault.swift in Sources */,
+				AA0000000000000000000224 /* SharedSnapshotStore.swift in Sources */,
+				AA0000000000000000000226 /* QuotaProvider.swift in Sources */,
+				AA0000000000000000000227 /* CopilotProvider.swift in Sources */,
+				AA0000000000000000000228 /* DeepSeekProvider.swift in Sources */,
+				AA0000000000000000000229 /* OpenRouterProvider.swift in Sources */,
+				AA000000000000000000022A /* GLMProvider.swift in Sources */,
+				AA000000000000000000022B /* QuotaCoordinator.swift in Sources */,
 				AA000000000000000000007A /* QuotaModels.swift in Sources */,
 				AA000000000000000000007B /* CopilotQuotaClient.swift in Sources */,
 				AA000000000000000000007C /* GitHubDeviceFlow.swift in Sources */,
@@ -342,13 +416,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA0000000000000000000080 /* CopilotQuotaWidget.swift in Sources */,
-				AA0000000000000000000081 /* QuotaModels.swift in Sources */,
-				AA0000000000000000000082 /* CopilotQuotaClient.swift in Sources */,
-				AA0000000000000000000111 /* KeychainStore.swift in Sources */,
-				AA0000000000000000000083 /* SharedStore.swift in Sources */,
+				AA0000000000000000000231 /* QuotaCoreModels.swift in Sources */,
+				AA0000000000000000000232 /* ProviderGlyphView.swift in Sources */,
+				AA0000000000000000000233 /* SharedSnapshotStore.swift in Sources */,
 				AA0000000000000000000084 /* CopilotIconShape.swift in Sources */,
 				AA0000000000000000000085 /* QuotaRingView.swift in Sources */,
-				AA0000000000000000000086 /* GitHubDeviceFlow.swift in Sources */,
 				AA000000000000000000009A /* L10n.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -360,6 +432,19 @@
 				AA0000000000000000000120 /* QuotaModelsTests.swift in Sources */,
 				AA0000000000000000000121 /* UpdateCheckerTests.swift in Sources */,
 				AA0000000000000000000122 /* TokenManagerAndStoreTests.swift in Sources */,
+				AA000000000000000000024C /* QuotaCoreModelsTests.swift in Sources */,
+				AA000000000000000000024D /* ProvidersDecodingTests.swift in Sources */,
+				AA000000000000000000024E /* VaultAndCoordinatorTests.swift in Sources */,
+				AA0000000000000000000241 /* QuotaCoreModels.swift in Sources */,
+				AA0000000000000000000242 /* KeychainVault.swift in Sources */,
+				AA0000000000000000000243 /* SharedSnapshotStore.swift in Sources */,
+				AA0000000000000000000244 /* QuotaProvider.swift in Sources */,
+				AA0000000000000000000245 /* CopilotProvider.swift in Sources */,
+				AA0000000000000000000246 /* DeepSeekProvider.swift in Sources */,
+				AA0000000000000000000247 /* OpenRouterProvider.swift in Sources */,
+				AA0000000000000000000248 /* GLMProvider.swift in Sources */,
+				AA0000000000000000000249 /* QuotaCoordinator.swift in Sources */,
+				AA000000000000000000024A /* LaunchAtLogin.swift in Sources */,
 				AA0000000000000000000123 /* QuotaModels.swift in Sources */,
 				AA0000000000000000000124 /* CopilotQuotaClient.swift in Sources */,
 				AA0000000000000000000125 /* GitHubDeviceFlow.swift in Sources */,
@@ -440,22 +525,22 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 7;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = NO;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CopilotQuota/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Copilot Quota";
+				INFOPLIST_KEY_CFBundleDisplayName = QuotaRing;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.4.0;
-				PRODUCT_BUNDLE_IDENTIFIER = app.solocraft.copilotquota;
-				PRODUCT_NAME = "Copilot Quota";
+				MARKETING_VERSION = 2.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.solocraft.quotaring;
+				PRODUCT_NAME = QuotaRing;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -465,22 +550,22 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 7;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = NO;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CopilotQuota/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Copilot Quota";
+				INFOPLIST_KEY_CFBundleDisplayName = QuotaRing;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.4.0;
-				PRODUCT_BUNDLE_IDENTIFIER = app.solocraft.copilotquota;
-				PRODUCT_NAME = "Copilot Quota";
+				MARKETING_VERSION = 2.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.solocraft.quotaring;
+				PRODUCT_NAME = QuotaRing;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -490,7 +575,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 7;
 				CODE_SIGN_ENTITLEMENTS = CopilotQuotaWidget/CopilotQuotaWidget.entitlements;
 				ENABLE_APP_SANDBOX = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -499,8 +584,8 @@
 					"$(inherited)",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.4.0;
-				PRODUCT_BUNDLE_IDENTIFIER = app.solocraft.copilotquota.widget;
+				MARKETING_VERSION = 2.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.solocraft.quotaring.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -513,7 +598,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 7;
 				CODE_SIGN_ENTITLEMENTS = CopilotQuotaWidget/CopilotQuotaWidget.entitlements;
 				ENABLE_APP_SANDBOX = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -522,8 +607,8 @@
 					"$(inherited)",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.4.0;
-				PRODUCT_BUNDLE_IDENTIFIER = app.solocraft.copilotquota.widget;
+				MARKETING_VERSION = 2.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.solocraft.quotaring.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -542,7 +627,7 @@
 					"@loader_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				PRODUCT_BUNDLE_IDENTIFIER = app.solocraft.copilotquota.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = app.solocraft.quotaring.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				WRAPPER_EXTENSION = xctest;
@@ -559,7 +644,7 @@
 					"@loader_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				PRODUCT_BUNDLE_IDENTIFIER = app.solocraft.copilotquota.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = app.solocraft.quotaring.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				WRAPPER_EXTENSION = xctest;

@@ -88,7 +88,7 @@ enum UpdateCheckResult: Equatable {
 
 /// Zero-dependency update checker backed by GitHub Releases API.
 struct UpdateChecker {
-    static let latestReleaseURL = URL(string: "https://api.github.com/repos/addozhang/CopilotQuota/releases/latest")!
+    static let latestReleaseURL = URL(string: "https://api.github.com/repos/addozhang/QuotaRing/releases/latest")!
 
     /// Pure comparison logic — easy to unit test without networking.
     static func evaluate(release: GitHubRelease, currentVersion: String) -> UpdateInfo? {

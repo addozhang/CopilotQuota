@@ -181,14 +181,14 @@ public enum SVGPath {
 
         mutating func parseArc(relative: Bool) {
             guard let rx = readNumber(), let ry = readNumber(), let rotation = readNumber(),
-                  let largeFlag = readNumber(), let sweepFlag = readNumber(),
+                  let largeFlag = readFlag(), let sweepFlag = readFlag(),
                   let endRaw = readPoint() else { return }
             let end = relative ? current.offsetBy(endRaw) : endRaw
             addArc(from: current, to: end,
                    rx: abs(rx), ry: abs(ry),
                    xAxisRotationDegrees: rotation,
-                   largeArc: largeFlag != 0,
-                   sweep: sweepFlag != 0)
+                   largeArc: largeFlag,
+                   sweep: sweepFlag)
             current = end
         }
 
@@ -281,6 +281,23 @@ public enum SVGPath {
         }
 
         // MARK: - Lexer
+
+        /// Per SVG path grammar, arc flags (`large-arc-flag`, `sweep-flag`) are
+        /// single `'0'`/`'1'` digits that may be concatenated without separators
+        /// (e.g. `a5 5 0 110 10` → flags `1`, `1`, then `dx = 0`).
+        mutating func readFlag() -> Bool? {
+            skipSeparators()
+            guard index < scalars.count else { return nil }
+            let s = scalars[index]
+            if s == "0" {
+                index += 1
+                return false
+            } else if s == "1" {
+                index += 1
+                return true
+            }
+            return nil
+        }
 
         mutating func readPoint() -> CGPoint? {
             guard let x = readNumber(), let y = readNumber() else { return nil }

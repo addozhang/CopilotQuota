@@ -13,7 +13,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-APP_NAME="Copilot Quota"
+APP_NAME="QuotaRing"
 DERIVED="$ROOT/build/DerivedData"
 OUTPUT="$ROOT/build/$APP_NAME.app"
 

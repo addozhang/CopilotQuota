@@ -20,15 +20,15 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-APP_NAME="Copilot Quota"
+APP_NAME="QuotaRing"
 APP_PATH="$ROOT/build/$APP_NAME.app"
 NOTARY_PROFILE="${NOTARY_KEYCHAIN_PROFILE:-solocraft-notary}"
 
 echo "==> 1. Building Release $APP_NAME.app..."
 ./scripts/build-app.sh
 VERSION="$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$APP_PATH/Contents/Info.plist")"
-ZIP_PATH="$ROOT/build/CopilotQuota-${VERSION}.zip"
-DMG_PATH="$ROOT/build/CopilotQuota-${VERSION}.dmg"
+ZIP_PATH="$ROOT/build/QuotaRing-${VERSION}.zip"
+DMG_PATH="$ROOT/build/QuotaRing-${VERSION}.dmg"
 
 echo "==> 2. Verifying code signature..."
 codesign --verify --deep --strict --verbose=2 "$APP_PATH"
@@ -79,11 +79,11 @@ hdiutil create -volname "$APP_NAME" -srcfolder "$STAGING_DIR" -ov -format UDZO "
 rm -rf "$STAGING_DIR"
 
 DMG_SHA256="$(shasum -a 256 "$DMG_PATH" | awk '{print $1}')"
-SHA_PATH="$ROOT/build/CopilotQuota-${VERSION}.sha256"
+SHA_PATH="$ROOT/build/QuotaRing-${VERSION}.sha256"
 echo "$DMG_SHA256  $(basename "$DMG_PATH")" > "$SHA_PATH"
 
 # Keep Homebrew Cask formula in sync when present.
-CASK_PATH="$ROOT/Casks/copilot-quota.rb"
+CASK_PATH="$ROOT/Casks/quotaring.rb"
 if [[ -f "$CASK_PATH" ]]; then
   sed -i '' "s/^  version \".*\"/  version \"$VERSION\"/" "$CASK_PATH"
   sed -i '' "s/^  sha256 .*/  sha256 \"$DMG_SHA256\"/" "$CASK_PATH"

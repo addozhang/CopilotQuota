@@ -3,7 +3,7 @@ import AppKit
 
 /// Custom About window (replaces the standard about panel) with links to the repo.
 struct AboutView: View {
-    @EnvironmentObject var model: AppModel
+    @EnvironmentObject var coordinator: QuotaCoordinator
 
     var body: some View {
         VStack(spacing: 14) {
@@ -11,25 +11,25 @@ struct AboutView: View {
                 .resizable()
                 .frame(width: 96, height: 96)
 
-            Text("Copilot Quota")
+            Text("QuotaRing")
                 .font(.title2.bold())
             Text(L("Version %@", AppInfo.version))
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .monospacedDigit()
 
-            Text(L("A tiny macOS widget for your GitHub Copilot quota."))
+            Text(L("Battery-style macOS menu bar & desktop widgets for your AI quotas."))
                 .font(.callout)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
 
-            if let update = model.availableUpdate {
+            if let update = coordinator.availableUpdate {
                 Button(L("Download v%@", update.version)) {
                     NSWorkspace.shared.open(update.downloadURL)
                 }
                 .controlSize(.small)
                 .linkCursor()
-            } else if let status = model.updateStatusMessage {
+            } else if let status = coordinator.updateStatusMessage {
                 Text(status)
                     .font(.caption2)
                     .foregroundStyle(.secondary)
@@ -39,12 +39,12 @@ struct AboutView: View {
 
             VStack(spacing: 10) {
                 Button {
-                    Task { await model.checkForUpdates(userInitiated: true) }
+                    Task { await coordinator.checkForUpdates(userInitiated: true) }
                 } label: {
                     Label(L("Check for Updates"), systemImage: "arrow.triangle.2.circlepath")
                 }
                 .buttonStyle(.link)
-                .disabled(model.isCheckingUpdates)
+                .disabled(coordinator.isCheckingUpdates)
 
                 Link(destination: AppInfo.repoURL) {
                     Label(L("View on GitHub"), systemImage: "star")

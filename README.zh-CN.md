@@ -1,78 +1,57 @@
-# Copilot Quota
+# QuotaRing
 
 **[English](README.md)** | 简体中文
 
-**[官网](https://solocraft.app/copilot-quota) · [下载 DMG](https://github.com/addozhang/CopilotQuota/releases/latest)**
+**[官网](https://solocraft.app/copilot-quota) · [下载 DMG](https://github.com/addozhang/QuotaRing/releases/latest)**
 
-仿系统电池样式的 macOS 菜单栏应用与桌面小组件（WidgetKit）：一个圆环 + Copilot 图标 + 剩余百分比。
+> 原 **Copilot Quota** —— 在 v2.0 升级为多 AI 配额与余额监控工具，延续极简的 macOS 系统电池小组件美学。
 
-| 桌面小组件 | App |
-| :---: | :---: |
-| ![小组件](preview/widget.png) | ![App](preview/app.png) |
+仿系统电池样式的 macOS 菜单栏应用与桌面小组件（WidgetKit），一站式查看你的 AI 订阅配额与预付余额：
+
+- **GitHub Copilot** — OAuth 设备授权 · 月度高级请求配额与重置倒计时
+- **DeepSeek** — API Key · 预付余额（`CNY` / `USD`，含充值/赠金明细，支持可选参考上限与低余额变色）
+- **OpenRouter** — API Key · 美元预付额度与可选预算上限
+- **GLM Coding Plan** — API Key · 同时支持国内站（`open.bigmodel.cn`）与国际站（`api.z.ai`）· 5 小时与周滚动窗口
+- *（v2.1 规划：Google AI Pro 支持与低配额系统通知）*
 
 ## 安装
 
 ### 下载 DMG
 
-下载 [最新版本](https://github.com/addozhang/CopilotQuota/releases/latest) 的 DMG，
-打开并把 `Copilot Quota.app` 拖入「应用程序」——App 已使用 **Developer ID
-证书签名并通过 Apple 公证**，首次打开无需任何 Gatekeeper 放行操作。
+下载 [最新版本](https://github.com/addozhang/QuotaRing/releases/latest) 的 DMG，
+打开并把 `QuotaRing.app` 拖入「应用程序」——App 使用 **Developer ID 证书签名并通过 Apple 公证**。
 
 ### Homebrew
 
 ```bash
-brew tap addozhang/copilot-quota https://github.com/addozhang/CopilotQuota
-brew install --cask copilot-quota
-```
-
-可自行校验签名：
-
-```bash
-spctl -a -t exec -vv "/Applications/Copilot Quota.app"
-# → accepted, source=Notarized Developer ID
+brew tap addozhang/quotaring https://github.com/addozhang/QuotaRing
+brew install --cask quotaring
 ```
 
 需要 macOS 14+ · Universal 双架构（Apple Silicon 和 Intel）。
 
 ## 使用
 
-1. 打开 **Copilot Quota** → 用 GitHub 登录（OAuth 设备授权流程）。
-2. 右键桌面 → 编辑小组件 → 添加 **Copilot**。
-
-默认以**纯菜单栏模式**运行（隐藏 Dock 图标），在菜单栏常驻展示 Copilot 图标与剩余百分比。
-点击菜单栏图标或桌面小组件即可查看剩余次数、重置倒计时、调整刷新间隔（5 / 10 / 30 / 60 分钟）、
-开启开机自启、切换是否显示 Dock 图标以及检查更新。
+1. 点击顶部菜单栏中的 **QuotaRing** 图标（默认仅显示图标，隐藏 Dock 图标）。
+2. 点击 **+** 连接 GitHub Copilot、DeepSeek、GLM Coding 或 OpenRouter。
+   *（从 Copilot Quota v1.x 升级时，原有的 GitHub Copilot Keychain 凭证与偏好设置会自动无缝迁移。）*
+3. 右键桌面 → **编辑小组件** → 搜索 **QuotaRing**：
+   - **小号小组件**：单个电池风圆环（右键「编辑小组件」可自由选择绑定的服务）。
+   - **中号小组件**：仿系统电池中号小组件，一排并列展示 2–4 个圆环。
 
 ## 从源码构建与测试
 
-用 Xcode 打开 `CopilotQuota.xcodeproj`，`⌘R` 运行；或：
-
 ```bash
-# 构建 Release
-xcodebuild -project CopilotQuota.xcodeproj -scheme CopilotQuota -configuration Release build
+# 构建 Universal Release
+./scripts/build-app.sh
 
 # 运行单元测试
 xcodebuild -project CopilotQuota.xcodeproj -scheme CopilotQuota -configuration Debug test
 ```
 
-## 发布
+## 架构与安全说明
 
-```bash
-./scripts/release.sh
-```
-
-构建 universal Release 产物：检测到 **Developer ID Application** 证书则正式
-签名（否则 ad-hoc），存在 `solocraft-notary` keychain profile 时自动提交
-Apple 公证并装订票据（一次性配置见脚本头部说明），自动同步更新
-`Casks/copilot-quota.rb` 中的版本号与 SHA256，产出
-`build/CopilotQuota-<版本>.zip`、`.dmg` 与 `.sha256`。
-
-推送 `v*` 标签也会自动触发 `.github/workflows/release.yml` 运行测试、构建打包并创建 GitHub Release。
-
-## 说明
-
-- 配额来自 `api.github.com/copilot_internal/user`（优先展示计量中的 `premium_interactions`，必要时回退到 `chat` / `completions`），用设备流程拿到的 token 拉取。
-- OAuth 凭证（scope 仅 `read:user`）原子存储在 **macOS Keychain** 中（老版本存于 `UserDefaults` 的明文 token 会在首次启动时自动迁移并清除）。
-- widget 扩展已沙盒化，缓存与偏好通过偏好域读写例外共享，Keychain 通过 ACL 共享，App 未运行时 widget 仍可自行轮换约 8 小时寿命的 OAuth token——个人使用 / Developer ID 分发没问题；上架 Mac App Store 需改为 App Group 方案。
-- 界面支持英文和简体中文，跟随系统语言。
+- **仅宿主持有凭证**：所有 OAuth Token 与 API Key 按账号隔离存储在 **macOS Keychain**（`app.solocraft.quotaring`），永不离开本机。
+- **纯渲染器小组件**：所有服务的并发刷新与 Token 轮换均由常驻菜单栏的宿主 App 统一完成；沙盒化的 Widget 扩展**零网络权限、零 Keychain 访问**，仅读取脱敏后的展示快照。
+- 界面支持英文与简体中文，跟随系统语言。
 - Copilot 图标基于 GitHub [Octicons](https://github.com/primer/octicons)（MIT）。
