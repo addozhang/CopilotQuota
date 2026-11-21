@@ -2,58 +2,154 @@ import Foundation
 
 /// Values shared between the host app and the widget extension.
 ///
-/// The host app is unsandboxed and writes the plain preference domain
-/// `app.solocraft.copilotquota`; the sandboxed widget extension accesses
-/// that same domain via a `temporary-exception.shared-preference.read-write`
-/// grant (see CopilotQuotaWidget.entitlements) so it can persist rotated
-/// token pairs and fresh quota while the app is not running. The legacy
-/// `com.addo.copilotquota` domain is listed too, for the one-time v1.3.x
-/// migration.
+/// Non-sensitive state (cached quota, refresh interval, heartbeat, preferences)
+/// lives in the shared preference domain `app.solocraft.copilotquota`.
+/// Sensitive OAuth credentials (`accessToken`, `refreshToken`, `expiresAt`)
+/// are stored atomically in the macOS Keychain via `KeychainCredentialStore`.
 enum SharedStore {
     static let suiteName = "app.solocraft.copilotquota"
     /// Pre-rebrand preference domain. Migrated once on first run.
     private static let legacySuiteName = "com.addo.copilotquota"
     private static let legacyMigratedKey = "legacyStoreMigrated"
-    private static let legacyKeys = ["githubToken", "githubRefreshToken",
-                                     "githubTokenExpiresAt", "cachedDisplay",
-                                     "refreshIntervalMinutes"]
+    private static let keychainMigratedKey = "keychainCredentialsMigrated"
+
+    private static let legacySettingsKeys = ["cachedDisplay", "refreshIntervalMinutes"]
+    private static let plaintextCredentialKeys = [
+        "githubToken", "githubRefreshToken", "githubTokenExpiresAt",
+    ]
+
     private static var migrationChecked = false
+    private static var customDefaults: UserDefaults?
+    private static var customLegacyDefaults: UserDefaults?
+    static var credentialStore: CredentialStoring = KeychainCredentialStore()
 
     private static var defaults: UserDefaults {
-        migrateLegacyStoreIfNeeded()
-        return UserDefaults(suiteName: suiteName) ?? .standard
+        migrateIfNeeded()
+        return customDefaults ?? UserDefaults(suiteName: suiteName) ?? .standard
     }
 
-    /// One-time carry-over of token/cache/settings from the pre-rebrand
-    /// domain, so updating users don't sign in again. The marker key lives
-    /// in the NEW domain and is set before copying — a later sign-out can
-    /// never resurrect the legacy token. Idempotent; safe from either
-    /// process (UserDefaults itself is thread-safe).
-    static func migrateLegacyStoreIfNeeded() {
+    private static var rawDefaults: UserDefaults {
+        customDefaults ?? UserDefaults(suiteName: suiteName) ?? .standard
+    }
+
+    private static var rawLegacyDefaults: UserDefaults? {
+        if let customLegacyDefaults { return customLegacyDefaults }
+        return UserDefaults(suiteName: legacySuiteName)
+    }
+
+    /// Test hook: inject isolated `UserDefaults` and `CredentialStoring`.
+    static func configureForTesting(defaults: UserDefaults,
+                                    legacyDefaults: UserDefaults? = nil,
+                                    credentialStore: CredentialStoring) {
+        self.customDefaults = defaults
+        self.customLegacyDefaults = legacyDefaults
+        self.credentialStore = credentialStore
+        self.migrationChecked = false
+    }
+
+    /// Restore production backing stores after tests.
+    static func resetToProduction() {
+        self.customDefaults = nil
+        self.customLegacyDefaults = nil
+        self.credentialStore = KeychainCredentialStore()
+        self.migrationChecked = false
+    }
+
+    /// One-time migrations:
+    /// 1. Carry over settings/cache from pre-rebrand `com.addo.copilotquota`.
+    /// 2. Move plaintext OAuth credentials from `UserDefaults` into Keychain
+    ///    and scrub the plaintext keys from disk.
+    static func migrateIfNeeded() {
         guard !migrationChecked else { return }
         migrationChecked = true
-        let store = UserDefaults(suiteName: suiteName) ?? .standard
-        guard !store.bool(forKey: legacyMigratedKey) else { return }
-        store.set(true, forKey: legacyMigratedKey)
-        guard let legacy = UserDefaults(suiteName: legacySuiteName) else { return }
-        for key in legacyKeys {
-            if let value = legacy.object(forKey: key) {
-                store.set(value, forKey: key)
+        let store = rawDefaults
+        let legacy = rawLegacyDefaults
+
+        // 1. Legacy domain settings carry-over.
+        if !store.bool(forKey: legacyMigratedKey) {
+            store.set(true, forKey: legacyMigratedKey)
+            if let legacy {
+                for key in legacySettingsKeys {
+                    if let value = legacy.object(forKey: key), store.object(forKey: key) == nil {
+                        store.set(value, forKey: key)
+                    }
+                }
+            }
+        }
+
+        // 2. Plaintext UserDefaults credentials -> Keychain.
+        if !store.bool(forKey: keychainMigratedKey) {
+            let source = readPlaintextCredentials(from: store)
+                ?? legacy.flatMap { readPlaintextCredentials(from: $0) }
+
+            if let source {
+                // Only write if Keychain doesn't already have credentials.
+                let migrated: Bool
+                if credentialStore.load() != nil {
+                    migrated = true
+                } else {
+                    migrated = credentialStore.save(source)
+                }
+                if migrated {
+                    scrubPlaintextCredentials(from: store)
+                    if let legacy { scrubPlaintextCredentials(from: legacy) }
+                    store.set(true, forKey: keychainMigratedKey)
+                }
+            } else {
+                store.set(true, forKey: keychainMigratedKey)
+            }
+        }
+    }
+
+    private static func readPlaintextCredentials(from defaults: UserDefaults) -> StoredCredentials? {
+        let rawToken = defaults.string(forKey: "githubToken")?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let token = rawToken, !token.isEmpty else { return nil }
+        let rawRefresh = defaults.string(forKey: "githubRefreshToken")?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let refresh = (rawRefresh?.isEmpty == false) ? rawRefresh : nil
+        let expiresAt = defaults.object(forKey: "githubTokenExpiresAt") as? Date
+        return StoredCredentials(accessToken: token, refreshToken: refresh, expiresAt: expiresAt)
+    }
+
+    private static func scrubPlaintextCredentials(from defaults: UserDefaults) {
+        for key in plaintextCredentialKeys {
+            defaults.removeObject(forKey: key)
+        }
+    }
+
+    // MARK: - Credentials (Keychain)
+
+    static var credentials: StoredCredentials? {
+        get {
+            migrateIfNeeded()
+            guard let creds = credentialStore.load() else { return nil }
+            let trimmed = creds.accessToken.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !trimmed.isEmpty else { return nil }
+            return creds
+        }
+        set {
+            migrateIfNeeded()
+            if let newValue {
+                credentialStore.save(newValue)
+            } else {
+                credentialStore.clear()
             }
         }
     }
 
     static var token: String? {
         get {
-            let raw = defaults.string(forKey: "githubToken")?
-                .trimmingCharacters(in: .whitespacesAndNewlines)
+            let raw = credentials?.accessToken.trimmingCharacters(in: .whitespacesAndNewlines)
             return (raw?.isEmpty == false) ? raw : nil
         }
         set {
             if let newValue, !newValue.isEmpty {
-                defaults.set(newValue, forKey: "githubToken")
+                var current = credentials ?? StoredCredentials(accessToken: newValue, refreshToken: nil, expiresAt: nil)
+                current.accessToken = newValue
+                credentials = current
             } else {
-                defaults.removeObject(forKey: "githubToken")
+                clearCredentials()
             }
         }
     }
@@ -61,52 +157,53 @@ enum SharedStore {
     /// OAuth refresh token (`ghr_…`). GitHub rotates it on every refresh —
     /// each refresh response returns a NEW refresh token and invalidates the
     /// old one, so both values must be persisted together, atomically.
-    /// Only the host app may write it; the widget has read-only access.
     static var refreshToken: String? {
         get {
-            let raw = defaults.string(forKey: "githubRefreshToken")?
-                .trimmingCharacters(in: .whitespacesAndNewlines)
+            let raw = credentials?.refreshToken?.trimmingCharacters(in: .whitespacesAndNewlines)
             return (raw?.isEmpty == false) ? raw : nil
         }
         set {
-            if let newValue, !newValue.isEmpty {
-                defaults.set(newValue, forKey: "githubRefreshToken")
-            } else {
-                defaults.removeObject(forKey: "githubRefreshToken")
-            }
+            guard var current = credentials else { return }
+            current.refreshToken = (newValue?.isEmpty == false) ? newValue : nil
+            credentials = current
         }
     }
 
     /// When the current access token expires (nil = unknown, legacy login).
     static var tokenExpiresAt: Date? {
-        get { defaults.object(forKey: "githubTokenExpiresAt") as? Date }
+        get { credentials?.expiresAt }
         set {
-            if let newValue {
-                defaults.set(newValue, forKey: "githubTokenExpiresAt")
-            } else {
-                defaults.removeObject(forKey: "githubTokenExpiresAt")
-            }
+            guard var current = credentials else { return }
+            current.expiresAt = newValue
+            credentials = current
         }
     }
 
-    /// Persist a full token pair (access + refresh + expiry) in one go.
+    /// Persist a full token pair (access + refresh + expiry) atomically in Keychain.
     /// May be called by BOTH the host app and the widget — the widget
     /// rotates the pair itself when the app has not been running past the
     /// token's ~8h lifetime (see TokenManager for the race protocol).
-    /// (Plain values, not a GitHubDeviceFlow.TokenPair, to keep this file
-    /// dependency-free.)
-    static func storeTokenPair(accessToken: String, refreshToken: String?, expiresInSeconds: Int) {
-        token = accessToken
-        self.refreshToken = refreshToken
-        tokenExpiresAt = Date().addingTimeInterval(TimeInterval(expiresInSeconds))
+    static func storeTokenPair(accessToken: String,
+                               refreshToken: String?,
+                               expiresInSeconds: Int,
+                               now: Date = Date()) {
+        let trimmedRefresh = refreshToken?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let creds = StoredCredentials(
+            accessToken: accessToken,
+            refreshToken: (trimmedRefresh?.isEmpty == false) ? trimmedRefresh : nil,
+            expiresAt: now.addingTimeInterval(TimeInterval(expiresInSeconds))
+        )
+        credentials = creds
     }
 
     /// Clear all credentials (sign out / refresh token revoked).
     static func clearCredentials() {
-        token = nil
-        refreshToken = nil
-        tokenExpiresAt = nil
+        migrateIfNeeded()
+        credentialStore.clear()
+        scrubPlaintextCredentials(from: rawDefaults)
     }
+
+    // MARK: - Cached Display & Settings (UserDefaults)
 
     static var cachedDisplay: QuotaDisplay? {
         get {
@@ -146,5 +243,12 @@ enum SharedStore {
         set {
             defaults.set(newValue, forKey: "refreshIntervalMinutes")
         }
+    }
+
+    /// Whether to show the app icon in the macOS Dock.
+    /// Defaults to `false` (pure Menu Bar accessory mode).
+    static var showDockIcon: Bool {
+        get { defaults.bool(forKey: "showDockIcon") }
+        set { defaults.set(newValue, forKey: "showDockIcon") }
     }
 }

@@ -78,8 +78,20 @@ ln -s /Applications "$STAGING_DIR/Applications"
 hdiutil create -volname "$APP_NAME" -srcfolder "$STAGING_DIR" -ov -format UDZO "$DMG_PATH" >/dev/null
 rm -rf "$STAGING_DIR"
 
+DMG_SHA256="$(shasum -a 256 "$DMG_PATH" | awk '{print $1}')"
+SHA_PATH="$ROOT/build/CopilotQuota-${VERSION}.sha256"
+echo "$DMG_SHA256  $(basename "$DMG_PATH")" > "$SHA_PATH"
+
+# Keep Homebrew Cask formula in sync when present.
+CASK_PATH="$ROOT/Casks/copilot-quota.rb"
+if [[ -f "$CASK_PATH" ]]; then
+  sed -i '' "s/^  version \".*\"/  version \"$VERSION\"/" "$CASK_PATH"
+  sed -i '' "s/^  sha256 .*/  sha256 \"$DMG_SHA256\"/" "$CASK_PATH"
+fi
+
 echo ""
 echo "✅ Release artifacts ready (v$VERSION):"
 echo "   • App Bundle : $APP_PATH"
 echo "   • DMG Image  : $DMG_PATH"
 echo "   • ZIP Archive: $ZIP_PATH"
+echo "   • SHA256     : $DMG_SHA256"

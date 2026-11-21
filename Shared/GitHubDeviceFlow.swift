@@ -265,15 +265,21 @@ enum TokenManager {
     /// - Throws `QuotaError.unauthorized` when the refresh token itself is
     ///   dead — in that case (app-side) credentials are cleared and the user
     ///   must re-authorize (refresh tokens live ~6 months).
-    static func validToken(forceRefresh: Bool = false,
-                           mayClearCredentials: Bool = true) async throws -> String {
+    static func validToken(
+        forceRefresh: Bool = false,
+        mayClearCredentials: Bool = true,
+        now: Date = Date(),
+        refresher: (String) async throws -> GitHubDeviceFlow.TokenPair = {
+            try await GitHubDeviceFlow().refreshTokens(refreshToken: $0)
+        }
+    ) async throws -> String {
         guard let storedToken = SharedStore.token else { throw Error.signedOut }
 
         let needsRefresh: Bool
         if forceRefresh {
             needsRefresh = true
         } else if let expiresAt = SharedStore.tokenExpiresAt {
-            needsRefresh = expiresAt <= Date().addingTimeInterval(refreshMargin)
+            needsRefresh = expiresAt <= now.addingTimeInterval(refreshMargin)
         } else {
             needsRefresh = false // legacy login without recorded expiry
         }
@@ -283,7 +289,7 @@ enum TokenManager {
         }
 
         do {
-            let token = try await rotate(refreshToken: refreshToken)
+            let token = try await rotate(refreshToken: refreshToken, now: now, refresher: refresher)
             tokenLog.info("token rotated, new access token valid ~\(8 * 3600, privacy: .public)s")
             return token
         } catch {
@@ -294,7 +300,7 @@ enum TokenManager {
             let latest = SharedStore.refreshToken
             if let latest, latest != refreshToken {
                 tokenLog.info("rotation raced — retrying with re-read refresh token")
-                if let token = try? await rotate(refreshToken: latest) {
+                if let token = try? await rotate(refreshToken: latest, now: now, refresher: refresher) {
                     return token
                 }
             }
@@ -309,27 +315,39 @@ enum TokenManager {
     }
 
     /// One refresh-grant round trip, persisting the rotated pair.
-    private static func rotate(refreshToken: String) async throws -> String {
-        let pair = try await GitHubDeviceFlow().refreshTokens(refreshToken: refreshToken)
+    private static func rotate(
+        refreshToken: String,
+        now: Date,
+        refresher: (String) async throws -> GitHubDeviceFlow.TokenPair
+    ) async throws -> String {
+        let pair = try await refresher(refreshToken)
         SharedStore.storeTokenPair(accessToken: pair.accessToken,
                                    refreshToken: pair.refreshToken,
-                                   expiresInSeconds: pair.expiresInSeconds)
+                                   expiresInSeconds: pair.expiresInSeconds,
+                                   now: now)
         return pair.accessToken
     }
 
     /// Fetch the quota with automatic token refresh and one 401 retry.
     /// (Host app only — the widget calls validToken/fetch directly and does
     /// NOT force-refresh on 401, to avoid rotation churn against the app.)
-    static func fetchQuota() async throws -> CopilotUserResponse {
-        let client = CopilotQuotaClient()
-        let token = try await validToken()
+    static func fetchQuota(
+        now: Date = Date(),
+        refresher: (String) async throws -> GitHubDeviceFlow.TokenPair = {
+            try await GitHubDeviceFlow().refreshTokens(refreshToken: $0)
+        },
+        fetcher: (String) async throws -> CopilotUserResponse = {
+            try await CopilotQuotaClient().fetch(token: $0)
+        }
+    ) async throws -> CopilotUserResponse {
+        let token = try await validToken(now: now, refresher: refresher)
         do {
-            return try await client.fetch(token: token)
+            return try await fetcher(token)
         } catch QuotaError.unauthorized {
             // Token was rejected early (revoked / clock skew): force one
             // refresh and retry before giving up.
-            let freshToken = try await validToken(forceRefresh: true)
-            return try await client.fetch(token: freshToken)
+            let freshToken = try await validToken(forceRefresh: true, now: now, refresher: refresher)
+            return try await fetcher(freshToken)
         }
     }
 }

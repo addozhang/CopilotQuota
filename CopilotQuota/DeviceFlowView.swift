@@ -4,6 +4,7 @@ import AppKit
 /// First-run login: GitHub OAuth Device Flow.
 struct DeviceFlowView: View {
     @ObservedObject var model: AppModel
+    var isPopover: Bool = false
 
     enum Phase: Equatable {
         case idle
@@ -69,15 +70,26 @@ struct DeviceFlowView: View {
 
             Spacer()
 
-            Link(destination: AppInfo.repoURL) {
-                Label("GitHub", systemImage: "star")
+            HStack {
+                Link(destination: AppInfo.repoURL) {
+                    Label("GitHub", systemImage: "star")
+                }
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .linkCursor()
+
+                if isPopover {
+                    Spacer()
+                    Button(L("Quit")) { NSApp.terminate(nil) }
+                        .buttonStyle(.link)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .linkCursor()
+                }
             }
-            .font(.caption)
-            .foregroundStyle(.secondary)
-            .linkCursor()
         }
-        .padding(28)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(isPopover ? 20 : 28)
+        .frame(minHeight: isPopover ? 320 : 420)
         .onDisappear { flowTask?.cancel() }
     }
 

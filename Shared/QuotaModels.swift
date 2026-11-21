@@ -62,6 +62,18 @@ struct CategoryQuota: Codable, Equatable {
     /// `nil` when the category is unlimited.
     var percentRemaining: Double?
     var unlimited: Bool
+    var entitlement: Double?
+    var remaining: Double?
+
+    init(percentRemaining: Double?,
+         unlimited: Bool,
+         entitlement: Double? = nil,
+         remaining: Double? = nil) {
+        self.percentRemaining = percentRemaining
+        self.unlimited = unlimited
+        self.entitlement = entitlement
+        self.remaining = remaining
+    }
 }
 
 /// The value the widget renders / the app shows.
@@ -76,6 +88,35 @@ struct QuotaDisplay: Codable, Equatable {
     var premium: CategoryQuota?
     var chat: CategoryQuota?
     var completions: CategoryQuota?
+    var primaryEntitlement: Double?
+    var primaryRemaining: Double?
+    var primaryUnlimited: Bool?
+
+    init(percentRemaining: Double,
+         primaryCategoryLabel: String,
+         planLabel: String?,
+         login: String?,
+         resetDate: String?,
+         fetchedAt: Date,
+         premium: CategoryQuota?,
+         chat: CategoryQuota? = nil,
+         completions: CategoryQuota? = nil,
+         primaryEntitlement: Double? = nil,
+         primaryRemaining: Double? = nil,
+         primaryUnlimited: Bool? = nil) {
+        self.percentRemaining = percentRemaining
+        self.primaryCategoryLabel = primaryCategoryLabel
+        self.planLabel = planLabel
+        self.login = login
+        self.resetDate = resetDate
+        self.fetchedAt = fetchedAt
+        self.premium = premium
+        self.chat = chat
+        self.completions = completions
+        self.primaryEntitlement = primaryEntitlement
+        self.primaryRemaining = primaryRemaining
+        self.primaryUnlimited = primaryUnlimited
+    }
 
     static var placeholder: QuotaDisplay {
         QuotaDisplay(percentRemaining: 83,
@@ -84,9 +125,24 @@ struct QuotaDisplay: Codable, Equatable {
                      login: "octocat",
                      resetDate: nil,
                      fetchedAt: .now,
-                     premium: CategoryQuota(percentRemaining: 83, unlimited: false),
-                     chat: CategoryQuota(percentRemaining: 100, unlimited: false),
-                     completions: nil)
+                     premium: CategoryQuota(percentRemaining: 83, unlimited: false, entitlement: 300, remaining: 249),
+                     primaryEntitlement: 300,
+                     primaryRemaining: 249,
+                     primaryUnlimited: false)
+    }
+
+    /// Whether the primary quota bucket is unlimited.
+    var isPrimaryUnlimited: Bool {
+        primaryUnlimited ?? (premium?.unlimited ?? false)
+    }
+
+    /// Formatted remaining/entitlement counts (e.g. "249 / 300"), or `nil` when unavailable or unlimited.
+    var primaryCountText: String? {
+        guard !isPrimaryUnlimited else { return nil }
+        let rem = primaryRemaining ?? premium?.remaining
+        let ent = primaryEntitlement ?? premium?.entitlement
+        guard let rem, let ent, ent > 0 else { return nil }
+        return "\(Int(rem.rounded())) / \(Int(ent.rounded()))"
     }
 
     /// Reset date rendered as a localized medium date ("Nov 1, 2026" /
@@ -100,11 +156,21 @@ struct QuotaDisplay: Codable, Equatable {
         return formatter.string(from: date)
     }
 
+    /// Whole days remaining until `resetDate` (clamped at 0). Returns `nil` when
+    /// `resetDate` is missing or unparseable.
+    func daysUntilReset(from referenceDate: Date = .now) -> Int? {
+        guard let target = Self.parseResetDate(resetDate) else { return nil }
+        let seconds = target.timeIntervalSince(referenceDate)
+        if seconds <= 0 { return 0 }
+        return Int(ceil(seconds / 86_400))
+    }
+
     /// Accepts ISO-8601 with/without fractional seconds and plain "yyyy-MM-dd".
     static func parseResetDate(_ raw: String?) -> Date? {
         guard let raw, !raw.isEmpty else { return nil }
         if raw.count == 10 {
             let dayOnly = DateFormatter()
+            dayOnly.locale = Locale(identifier: "en_US_POSIX")
             dayOnly.dateFormat = "yyyy-MM-dd"
             dayOnly.timeZone = TimeZone(identifier: "UTC")
             return dayOnly.date(from: raw)
@@ -122,6 +188,7 @@ extension CopilotUserResponse {
         switch copilotPlan {
         case "free": return "Copilot Free"
         case "individual": return "Copilot Pro"
+        case "individual_pro": return "Copilot Pro+"
         case "business": return "Copilot Business"
         case "enterprise": return "Copilot Enterprise"
         default:
@@ -132,10 +199,16 @@ extension CopilotUserResponse {
     private func category(_ snapshot: QuotaSnapshot?) -> CategoryQuota? {
         guard let snapshot else { return nil }
         if snapshot.unlimited == true {
-            return CategoryQuota(percentRemaining: nil, unlimited: true)
+            return CategoryQuota(percentRemaining: nil,
+                                 unlimited: true,
+                                 entitlement: snapshot.entitlement,
+                                 remaining: snapshot.remaining)
         }
         let percent = min(100, max(0, snapshot.percentRemaining ?? 100))
-        return CategoryQuota(percentRemaining: percent, unlimited: false)
+        return CategoryQuota(percentRemaining: percent,
+                             unlimited: false,
+                             entitlement: snapshot.entitlement,
+                             remaining: snapshot.remaining)
     }
 
     /// Prefer the metered "premium interactions" bucket, then chat, then completions.
@@ -172,6 +245,9 @@ extension CopilotUserResponse {
             fetchedAt: .now,
             premium: category(quotaSnapshots?.premiumInteractions),
             chat: category(quotaSnapshots?.chat),
-            completions: category(quotaSnapshots?.completions))
+            completions: category(quotaSnapshots?.completions),
+            primaryEntitlement: primary.quota.entitlement,
+            primaryRemaining: primary.quota.remaining,
+            primaryUnlimited: primary.quota.unlimited)
     }
 }

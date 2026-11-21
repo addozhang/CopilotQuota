@@ -5,21 +5,28 @@ import os
 
 private let logger = Logger(subsystem: "app.solocraft.copilotquota", category: "app")
 
+enum ContentPresentation {
+    case popover
+    case window
+}
+
 struct ContentView: View {
+    var presentation: ContentPresentation = .window
+
     // Owned by the App scene so the auto-refresh timer survives closing
-    // the window (the app process keeps running until Cmd-Q).
+    // the window (and keeps running in Menu Bar mode).
     @EnvironmentObject var model: AppModel
 
     var body: some View {
         Group {
             if model.token == nil {
-                DeviceFlowView(model: model)
+                DeviceFlowView(model: model, isPopover: presentation == .popover)
             } else {
-                StatusView(model: model)
+                StatusView(model: model, presentation: presentation)
             }
         }
-        .frame(width: 420, height: 480)
-        .onAppear { model.load() }
+        .frame(width: presentation == .popover ? 332 : 380)
+        .onAppear { model.syncPreferences() }
     }
 }
 
@@ -32,47 +39,79 @@ final class AppModel: ObservableObject {
     @Published var isRefreshing = false
     @Published var errorText: String?
     @Published var refreshInterval = 30
+    @Published var launchAtLogin = false
+    @Published var showDockIcon = false
+
+    @Published var availableUpdate: UpdateInfo?
+    @Published var isCheckingUpdates = false
+    @Published var updateStatusMessage: String?
 
     private var refreshTimer: Timer?
+    private var lastUpdateCheck: Date?
     // Block-based observers; AppModel lives for the app's whole lifetime,
     // so they are never unregistered (process teardown cleans up).
     private var observers: [NSObjectProtocol] = []
 
+    var menuBarPercentText: String? {
+        guard token != nil, let display else { return nil }
+        if display.isPrimaryUnlimited { return "∞" }
+        return "\(Int(display.percentRemaining.rounded()))%"
+    }
+
     init() {
-        // Start refreshing at app launch (not first window open) — the token
-        // expires ~8h after the last app-side refresh, and once it does the
-        // widget's own fetches all fail with 401. Keeping the app running
-        // (even with no window) keeps the token and the widget alive.
+        // Start refreshing at app launch (not first window open) — keeping the
+        // app running in the Menu Bar keeps quota and OAuth tokens fresh.
         load()
+
         // Timers don't fire while the Mac sleeps, and App Nap can coalesce
-        // them when the window is occluded — a repeating timer can sit up to
-        // a full interval behind. Catch up the moment the system wakes or
-        // the user returns to the app.
+        // them when occluded. Catch up when the system wakes or app activates.
         let wakeCenter = NSWorkspace.shared.notificationCenter
         observers.append(wakeCenter.addObserver(
             forName: NSWorkspace.didWakeNotification, object: nil, queue: .main) { [weak self] _ in
-            Task { @MainActor in await self?.refreshIfStale(reason: "wake") }
+            Task { @MainActor in
+                await self?.refreshIfStale(reason: "wake")
+                await self?.checkForUpdatesIfDue()
+            }
         })
         observers.append(NotificationCenter.default.addObserver(
             forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in
             Task { @MainActor in await self?.refreshIfStale(reason: "app-active") }
         })
+
+        Task { await checkForUpdatesIfDue() }
     }
 
     func load() {
         token = SharedStore.token
         display = SharedStore.cachedDisplay
-        refreshInterval = SharedStore.refreshIntervalMinutes
+        syncPreferences()
         startAutoRefresh()
-        // Fetch immediately instead of waiting a full interval — the cached
-        // "Updated at" can be a day old if the app hasn't run since.
         if token != nil {
             Task { await refresh(silent: display != nil) }
         }
-        // Push a fresh timeline after app updates — otherwise the system may
-        // keep rendering the stale widget snapshot (old layout/data) until the
-        // next scheduled reload lands.
         WidgetCenter.shared.reloadAllTimelines()
+    }
+
+    func syncPreferences() {
+        refreshInterval = SharedStore.refreshIntervalMinutes
+        showDockIcon = SharedStore.showDockIcon
+        launchAtLogin = LaunchAtLogin.isEnabled
+    }
+
+    func setLaunchAtLogin(_ enabled: Bool) {
+        launchAtLogin = LaunchAtLogin.setEnabled(enabled)
+    }
+
+    func setShowDockIcon(_ show: Bool) {
+        SharedStore.showDockIcon = show
+        showDockIcon = show
+        let policy: NSApplication.ActivationPolicy = show ? .regular : .accessory
+        if NSApp.activationPolicy() != policy {
+            NSApp.setActivationPolicy(policy)
+        }
+        if show {
+            NSApp.activate(ignoringOtherApps: true)
+        }
     }
 
     /// The interval timer can miss beats (sleep, App Nap). When the system
@@ -111,9 +150,7 @@ final class AppModel: ObservableObject {
 
     func refresh(silent: Bool = false) async {
         guard token != nil else { return }
-        guard !isRefreshing else { return } // load() can fire twice at launch
-        // Advertise liveness so the widget leaves fetching/token rotation to
-        // us while the app is running (see QuotaProvider.appIsAlive).
+        guard !isRefreshing else { return }
         SharedStore.appHeartbeat = Date()
         isRefreshing = !silent
         errorText = nil
@@ -128,12 +165,44 @@ final class AppModel: ObservableObject {
             logger.info("refresh ok: \(display.primaryCategoryLabel, privacy: .public) \(display.percentRemaining, format: .fixed(precision: 0), privacy: .public)%")
             WidgetCenter.shared.reloadAllTimelines()
         } catch QuotaError.unauthorized where SharedStore.token == nil {
-            // Refresh token died — TokenManager already cleared credentials.
             logger.error("signed out: refresh token rejected")
             token = nil
         } catch {
             errorText = (error as? QuotaError)?.errorDescription ?? error.localizedDescription
             logger.error("refresh failed: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    func checkForUpdatesIfDue() async {
+        if let last = lastUpdateCheck, Date().timeIntervalSince(last) < 24 * 3600 {
+            return
+        }
+        await checkForUpdates(userInitiated: false)
+    }
+
+    func checkForUpdates(userInitiated: Bool) async {
+        guard !isCheckingUpdates else { return }
+        isCheckingUpdates = true
+        if userInitiated {
+            updateStatusMessage = nil
+        }
+        defer { isCheckingUpdates = false }
+
+        lastUpdateCheck = Date()
+        let result = await UpdateChecker().check()
+        switch result {
+        case .available(let info):
+            availableUpdate = info
+            updateStatusMessage = nil
+        case .upToDate:
+            availableUpdate = nil
+            if userInitiated {
+                updateStatusMessage = L("You’re up to date (v%@).", AppInfo.version)
+            }
+        case .failed(let message):
+            if userInitiated {
+                updateStatusMessage = message
+            }
         }
     }
 
@@ -153,111 +222,60 @@ final class AppModel: ObservableObject {
 
 struct StatusView: View {
     @ObservedObject var model: AppModel
+    var presentation: ContentPresentation
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 14) {
             header
 
             if let display = model.display {
-                HStack(spacing: 12) {
-                    if let premium = display.premium {
-                        CategoryCard(label: "Premium", quota: premium)
-                    }
-                    if let chat = display.chat {
-                        CategoryCard(label: "Chat", quota: chat)
-                    }
-                    if let completions = display.completions {
-                        CategoryCard(label: "Completions", quota: completions)
-                    }
-                }
-
-                HStack(spacing: 14) {
-                    if let reset = display.resetDate {
-                        Label(L("Quota resets on %@", display.resetDateLocalized ?? reset),
-                              systemImage: "calendar.badge.clock")
-                    }
-                    HStack(spacing: 4) {
-                        Text(L("Updated at %@", display.fetchedAt.formatted(date: .omitted, time: .shortened)))
-                        Text("·")
-                        // Live-updating relative time makes staleness obvious.
-                        Text(display.fetchedAt, style: .relative)
-                    }
-                }
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                primaryQuotaCard(display)
             } else if model.isRefreshing {
-                Spacer()
                 ProgressView(L("Fetching quota…"))
-                Spacer()
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 28)
             }
 
-            // 刷新间隔设置（写入共享存储，widget 立即按新间隔重排）
-            VStack(alignment: .leading, spacing: 4) {
-                HStack {
-                    Text(L("Widget refresh interval"))
-                        .font(.callout)
-                    Spacer()
-                    Picker(L("Widget refresh interval"), selection: Binding(
-                        get: { model.refreshInterval },
-                        set: { newValue in
-                            model.refreshInterval = newValue
-                            model.saveRefreshInterval(newValue)
-                        })) {
-                        Text(L("%d min", 5)).tag(5)
-                        Text(L("%d min", 10)).tag(10)
-                        Text(L("%d min", 30)).tag(30)
-                        Text(L("%d min", 60)).tag(60)
-                    }
-                    .pickerStyle(.menu)
-                    .labelsHidden()
-                    .frame(width: 130)
-                }
-                Text(L("The system applies a daily widget reload budget; actual frequency may be throttled."))
-                    .font(.caption2)
-                    .foregroundStyle(.tertiary)
+            if let update = model.availableUpdate {
+                updateBanner(update)
+            } else if let status = model.updateStatusMessage {
+                Text(status)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
 
             if let error = model.errorText {
                 Text(error)
                     .font(.caption)
                     .foregroundStyle(.red)
-                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
-
-            Spacer()
 
             Divider()
-            HStack {
-                Text(L("Add to desktop: right-click the desktop → Edit Widgets → search “Copilot”"))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Spacer()
-                Link(destination: AppInfo.repoURL) {
-                    Label("GitHub", systemImage: "star")
-                }
-                .font(.caption)
-                .linkCursor()
-                Button(L("Sign Out")) { model.signOut() }
-                    .buttonStyle(.link)
-                    .foregroundStyle(.red)
-                    .linkCursor()
-            }
+
+            settingsSection
+
+            Divider()
+
+            footer
         }
-        .padding(24)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .padding(presentation == .popover ? 16 : 22)
     }
 
     private var header: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 10) {
             ZStack {
                 Circle().fill(Color.primary.opacity(0.06))
-                CopilotIconShape().fill(.primary).frame(width: 30, height: 30)
+                CopilotIconShape().fill(.primary).frame(width: 24, height: 24)
             }
-            .frame(width: 44, height: 44)
+            .frame(width: 36, height: 36)
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 1) {
                 Text(model.display?.login ?? "GitHub Copilot")
                     .font(.headline)
+                    .lineLimit(1)
                 if let plan = model.display?.planLabel {
                     Text(plan)
                         .font(.caption)
@@ -282,6 +300,168 @@ struct StatusView: View {
             .linkCursor()
         }
     }
+
+    private func primaryQuotaCard(_ display: QuotaDisplay) -> some View {
+        HStack(spacing: 16) {
+            QuotaRingView(
+                percent: display.isPrimaryUnlimited ? 100 : display.percentRemaining,
+                size: 68
+            )
+
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text(display.isPrimaryUnlimited
+                         ? "∞"
+                         : "\(Int(display.percentRemaining.rounded()))%")
+                        .font(.system(size: 28, weight: .semibold, design: .rounded))
+                        .monospacedDigit()
+
+                    if let countText = display.primaryCountText {
+                        Text(countText)
+                            .font(.callout)
+                            .monospacedDigit()
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
+                if let resetText = resetSummary(display) {
+                    Label(resetText, systemImage: "calendar.badge.clock")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+
+                HStack(spacing: 4) {
+                    Text(L("Updated at %@", display.fetchedAt.formatted(date: .omitted, time: .shortened)))
+                    Text("·")
+                    Text(display.fetchedAt, style: .relative)
+                }
+                .font(.caption2)
+                .foregroundStyle(.tertiary)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(14)
+        .background(Color.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
+    }
+
+    private func resetSummary(_ display: QuotaDisplay) -> String? {
+        guard let reset = display.resetDate else { return nil }
+        let dateStr = display.resetDateLocalized ?? reset
+        if let days = display.daysUntilReset() {
+            return L("Resets %@ (%d d left)", dateStr, days)
+        }
+        return L("Quota resets on %@", dateStr)
+    }
+
+    private func updateBanner(_ update: UpdateInfo) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: "arrow.down.circle.fill")
+                .foregroundStyle(Color.accentColor)
+            Text(L("Update available: v%@", update.version))
+                .font(.caption.weight(.medium))
+            Spacer()
+            Button(L("Download")) {
+                NSWorkspace.shared.open(update.downloadURL)
+            }
+            .controlSize(.small)
+            .linkCursor()
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .background(Color.accentColor.opacity(0.10), in: RoundedRectangle(cornerRadius: 8))
+    }
+
+    private var settingsSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text(L("Refresh interval"))
+                    .font(.callout)
+                Spacer()
+                Picker(L("Refresh interval"), selection: Binding(
+                    get: { model.refreshInterval },
+                    set: { newValue in
+                        model.refreshInterval = newValue
+                        model.saveRefreshInterval(newValue)
+                    })) {
+                    Text(L("%d min", 5)).tag(5)
+                    Text(L("%d min", 10)).tag(10)
+                    Text(L("%d min", 30)).tag(30)
+                    Text(L("%d min", 60)).tag(60)
+                }
+                .pickerStyle(.menu)
+                .labelsHidden()
+                .frame(width: 112)
+            }
+
+            Toggle(L("Launch at login"), isOn: Binding(
+                get: { model.launchAtLogin },
+                set: { model.setLaunchAtLogin($0) }
+            ))
+            .font(.callout)
+            .toggleStyle(.switch)
+            .controlSize(.small)
+
+            Toggle(L("Show Dock icon"), isOn: Binding(
+                get: { model.showDockIcon },
+                set: { model.setShowDockIcon($0) }
+            ))
+            .font(.callout)
+            .toggleStyle(.switch)
+            .controlSize(.small)
+        }
+    }
+
+    private var footer: some View {
+        HStack(spacing: 12) {
+            Button {
+                Task { await model.checkForUpdates(userInitiated: true) }
+            } label: {
+                if model.isCheckingUpdates {
+                    ProgressView().controlSize(.mini)
+                } else {
+                    Text(L("Check for Updates"))
+                }
+            }
+            .buttonStyle(.link)
+            .font(.caption)
+            .disabled(model.isCheckingUpdates)
+            .linkCursor()
+
+            if presentation == .popover {
+                Button(L("About")) {
+                    NSApp.activate(ignoringOtherApps: true)
+                    openWindow(id: "about")
+                }
+                .buttonStyle(.link)
+                .font(.caption)
+                .linkCursor()
+            } else {
+                Link(destination: AppInfo.repoURL) {
+                    Label("GitHub", systemImage: "star")
+                }
+                .font(.caption)
+                .linkCursor()
+            }
+
+            Spacer()
+
+            Button(L("Sign Out")) { model.signOut() }
+                .buttonStyle(.link)
+                .font(.caption)
+                .foregroundStyle(.red)
+                .linkCursor()
+
+            if presentation == .popover {
+                Button(L("Quit")) { NSApp.terminate(nil) }
+                    .buttonStyle(.link)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .linkCursor()
+            }
+        }
+    }
 }
 
 // MARK: - Cursor
@@ -296,30 +476,5 @@ extension View {
                 NSCursor.pop()
             }
         }
-    }
-}
-
-struct CategoryCard: View {
-    let label: String
-    let quota: CategoryQuota
-
-    private var percentText: String {
-        quota.percentRemaining.map { "\(Int($0.rounded()))%" } ?? "∞"
-    }
-
-    var body: some View {
-        VStack(spacing: 8) {
-            QuotaRingView(percent: quota.unlimited ? 100 : quota.percentRemaining,
-                          size: 46)
-            Text(percentText)
-                .font(.system(.callout, design: .rounded).weight(.semibold))
-                .monospacedDigit()
-            Text(label)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 10)
-        .background(Color.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 10))
     }
 }
