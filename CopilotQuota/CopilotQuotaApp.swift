@@ -2,14 +2,23 @@ import SwiftUI
 import AppKit
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    private var openedViaURL = false
+
+    func application(_ application: NSApplication, open urls: [URL]) {
+        openedViaURL = true
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         let store = SharedSnapshotStore.shared
         applyDockPolicy(showDockIcon: store.showDockIcon)
 
         // When launched in default pure Menu Bar mode and at least one provider
-        // is already configured, stay quietly in the menu bar without flashing a window.
+        // is already configured, stay quietly in the menu bar without flashing a window
+        // — unless the app was explicitly opened via a widget click (quotaring://open).
         if !store.accounts.isEmpty && !store.showDockIcon {
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { [weak self] in
+                guard self?.openedViaURL != true else { return }
                 for window in NSApp.windows where window.identifier?.rawValue == "main" {
                     window.close()
                 }

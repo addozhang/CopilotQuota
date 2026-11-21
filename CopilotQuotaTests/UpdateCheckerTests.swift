@@ -11,29 +11,29 @@ final class UpdateCheckerTests: XCTestCase {
     }
 
     func testEvaluatePrefersDMGAssetWhenNewer() {
-        let dmgURL = URL(string: "https://github.com/addozhang/CopilotQuota/releases/download/v1.4.0/CopilotQuota-1.4.0.dmg")!
-        let zipURL = URL(string: "https://github.com/addozhang/CopilotQuota/releases/download/v1.4.0/CopilotQuota-1.4.0.zip")!
-        let htmlURL = URL(string: "https://github.com/addozhang/CopilotQuota/releases/tag/v1.4.0")!
+        let dmgURL = URL(string: "https://github.com/addozhang/QuotaRing/releases/download/v2.1.0/QuotaRing-2.1.0.dmg")!
+        let zipURL = URL(string: "https://github.com/addozhang/QuotaRing/releases/download/v2.1.0/QuotaRing-2.1.0.zip")!
+        let htmlURL = URL(string: "https://github.com/addozhang/QuotaRing/releases/tag/v2.1.0")!
 
         let release = GitHubRelease(
-            tagName: "v1.4.0",
+            tagName: "v2.1.0",
             htmlURL: htmlURL,
             draft: false,
             prerelease: false,
             assets: [
-                .init(name: "CopilotQuota-1.4.0.zip", browserDownloadURL: zipURL),
-                .init(name: "CopilotQuota-1.4.0.dmg", browserDownloadURL: dmgURL),
+                .init(name: "QuotaRing-2.1.0.zip", browserDownloadURL: zipURL),
+                .init(name: "QuotaRing-2.1.0.dmg", browserDownloadURL: dmgURL),
             ]
         )
 
-        let info = UpdateChecker.evaluate(release: release, currentVersion: "1.3.0")
-        XCTAssertEqual(info?.version, "1.4.0")
+        let info = UpdateChecker.evaluate(release: release, currentVersion: "2.0.0")
+        XCTAssertEqual(info?.version, "2.1.0")
         XCTAssertEqual(info?.downloadURL, dmgURL)
         XCTAssertEqual(info?.releaseURL, htmlURL)
     }
 
     func testEvaluateIgnoresSameOlderDraftOrPrerelease() {
-        let htmlURL = URL(string: "https://github.com/addozhang/CopilotQuota/releases/tag/v1.4.0")!
+        let htmlURL = URL(string: "https://github.com/addozhang/QuotaRing/releases/tag/v2.1.0")!
 
         let same = GitHubRelease(tagName: "v1.3.0", htmlURL: htmlURL, draft: false, prerelease: false, assets: nil)
         XCTAssertNil(UpdateChecker.evaluate(release: same, currentVersion: "1.3.0"))

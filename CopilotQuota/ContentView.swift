@@ -35,6 +35,7 @@ struct ContentView: View {
         }
         .padding(presentation == .popover ? 16 : 20)
         .frame(width: presentation == .popover ? 344 : 390)
+        .fixedSize(horizontal: false, vertical: true)
         .onAppear { coordinator.syncPreferences() }
     }
 
@@ -137,28 +138,40 @@ struct ContentView: View {
         .padding(.vertical, 8)
     }
 
+    @ViewBuilder
     private var accountsList: some View {
-        ScrollView {
-            VStack(spacing: 10) {
-                ForEach(coordinator.accounts) { account in
-                    ProviderCardView(
-                        account: account,
-                        snapshot: coordinator.snapshots[account.id],
-                        errorText: coordinator.accountErrors[account.id],
-                        onRefresh: {
-                            Task { await coordinator.refresh(account: account) }
-                        },
-                        onEdit: {
-                            editingAccount = account
-                        },
-                        onRemove: {
-                            coordinator.removeAccount(account)
-                        }
-                    )
-                }
+        // Avoid wrapping <=4 cards in ScrollView: on macOS, ScrollView does not
+        // report intrinsic content height to MenuBarExtra(.window) or
+        // .windowResizability(.contentSize), causing fixed/clipped popover heights.
+        if coordinator.accounts.count <= 4 {
+            accountCards
+        } else {
+            ScrollView {
+                accountCards
+            }
+            .frame(height: 380)
+        }
+    }
+
+    private var accountCards: some View {
+        VStack(spacing: 10) {
+            ForEach(coordinator.accounts) { account in
+                ProviderCardView(
+                    account: account,
+                    snapshot: coordinator.snapshots[account.id],
+                    errorText: coordinator.accountErrors[account.id],
+                    onRefresh: {
+                        Task { await coordinator.refresh(account: account) }
+                    },
+                    onEdit: {
+                        editingAccount = account
+                    },
+                    onRemove: {
+                        coordinator.removeAccount(account)
+                    }
+                )
             }
         }
-        .frame(maxHeight: 320)
     }
 
     private func updateBanner(_ update: UpdateInfo) -> some View {

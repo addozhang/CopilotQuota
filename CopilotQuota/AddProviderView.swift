@@ -9,7 +9,6 @@ struct AddProviderView: View {
 
     @State private var selectedKind: ProviderKind?
     @State private var apiKey = ""
-    @State private var displayName = ""
     @State private var glmRegion: GLMRegion = .cn
     @State private var capText = ""
     @State private var warningText = ""
@@ -26,7 +25,6 @@ struct AddProviderView: View {
         self.initialKind = initialKind
         self.onDismiss = onDismiss
         _selectedKind = State(initialValue: editingAccount?.kind ?? initialKind)
-        _displayName = State(initialValue: editingAccount?.displayName ?? "")
         _glmRegion = State(initialValue: editingAccount?.glmRegion ?? .cn)
         _capText = State(initialValue: editingAccount?.balanceReferenceCap.map { String(format: "%.0f", $0) } ?? "")
         _warningText = State(initialValue: editingAccount?.warningThreshold.map { String(format: "%.0f", $0) } ?? "")
@@ -233,7 +231,6 @@ struct AddProviderView: View {
             coordinator.addAPIKeyAccount(
                 kind: kind,
                 apiKey: apiKey,
-                displayName: displayName.isEmpty ? nil : displayName,
                 region: regionValue,
                 balanceReferenceCap: cap,
                 warningThreshold: warning,
