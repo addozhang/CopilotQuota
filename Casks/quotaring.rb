@@ -1,6 +1,6 @@
 cask "quotaring" do
-  version "2.0.0"
-  sha256 "41c1f23a5ce59c253fa58a79de35bc2ba299aa8c9e80c4efc9600118602947d8"
+  version "2.0.1"
+  sha256 "ba5ba96f0cba1f82a932d347b50c8fdca4f52df76ed1ea4a776ed147b064ea28"
 
   url "https://github.com/addozhang/QuotaRing/releases/download/v#{version}/QuotaRing-#{version}.dmg"
   name "QuotaRing"
