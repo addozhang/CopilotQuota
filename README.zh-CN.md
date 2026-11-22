@@ -8,6 +8,10 @@
 
 仿系统电池样式的 macOS 菜单栏应用与桌面小组件（WidgetKit），一站式查看你的 AI 订阅配额与预付余额：
 
+| 桌面小组件 | 菜单栏 Popover |
+| :---: | :---: |
+| <img src="preview/widget.png" width="380" alt="桌面小组件" /> | <img src="preview/app.png" width="340" alt="菜单栏 Popover" /> |
+
 - **GitHub Copilot** — OAuth 设备授权 · 月度高级请求配额与重置倒计时
 - **DeepSeek** — API Key · 预付余额（`CNY` / `USD`，含充值/赠金明细，支持可选参考上限与低余额变色）
 - **OpenRouter** — API Key · 美元预付额度与可选预算上限

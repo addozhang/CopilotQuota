@@ -8,6 +8,10 @@ English | **[简体中文](README.zh-CN.md)**
 
 Battery-style macOS menu bar app and desktop widgets (WidgetKit) for your AI subscriptions and API balances:
 
+| Desktop widgets | Menu bar popover |
+| :---: | :---: |
+| <img src="preview/widget.png" width="380" alt="Desktop widgets" /> | <img src="preview/app.png" width="340" alt="Menu bar popover" /> |
+
 - **GitHub Copilot** — OAuth Device Flow · monthly premium request quota & reset countdown
 - **DeepSeek** — API Key · prepaid balance (`CNY` / `USD`, top-up + grant breakdown, optional budget cap)
 - **OpenRouter** — API Key · prepaid USD credits with optional budget cap
