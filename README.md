@@ -15,8 +15,9 @@ Battery-style macOS menu bar app and desktop widgets (WidgetKit) for your AI sub
 - **GitHub Copilot** — OAuth Device Flow · monthly premium request quota & reset countdown
 - **DeepSeek** — API Key · prepaid balance (`CNY` / `USD`, top-up + grant breakdown, optional budget cap)
 - **OpenRouter** — API Key · prepaid USD credits with optional budget cap
-- **GLM Coding Plan** — API Key · BigModel (`open.bigmodel.cn`) & Z.ai (`api.z.ai`) · 5-hour & weekly rolling windows
-- *(Planned for v2.1: Google AI Pro & low-quota system notifications)*
+- **GLM Coding Plan** — API Key · BigModel (`open.bigmodel.cn`) & Z.ai (`api.z.ai`) · 5-hour & 7-day rolling windows
+- **Kimi Code** — API Key (`sk-kimi-...`) · 5-hour & 7-day rolling windows
+- **MiniMax Coding** — API Key (`sk-cp-...`) · China (`api.minimaxi.com`) & Global (`api.minimax.io`) · 5-hour & 7-day rolling windows
 
 ## Install
 
@@ -38,11 +39,11 @@ Requires macOS 14+ · universal (Apple Silicon & Intel).
 ## Usage
 
 1. Open **QuotaRing** from the menu bar (icon-only by default, Dock icon hidden).
-2. Click **+** to connect GitHub Copilot, DeepSeek, GLM Coding, or OpenRouter.
+2. Click **+** to connect GitHub Copilot, DeepSeek, OpenRouter, GLM Coding, Kimi Code, or MiniMax Coding.
    *(Upgrading from Copilot Quota v1.x? Your existing GitHub Copilot Keychain credentials and preferences are migrated automatically.)*
 3. Right-click the desktop → **Edit Widgets** → search **QuotaRing**:
-   - **Small widget**: single battery-style ring (right-click → Edit Widget to pick any provider).
-   - **Medium widget**: macOS Batteries-style row of 2–4 rings side-by-side.
+   - **QuotaRing · Single (Small)**: single battery-style ring (right-click → Edit Widget to pick any provider).
+   - **QuotaRing · Dual (Medium)**: two rings side-by-side (`5h` + `7d`) for multi-window providers (GLM Coding, Kimi Code, MiniMax Coding).
 
 ## Build & Test
 

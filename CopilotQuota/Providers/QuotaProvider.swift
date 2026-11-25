@@ -35,6 +35,8 @@ struct ProviderRegistry: Sendable {
         DeepSeekProvider(),
         OpenRouterProvider(),
         GLMProvider(),
+        KimiProvider(),
+        MiniMaxProvider(),
     ])
 
     init(providers: [any QuotaProvider]) {

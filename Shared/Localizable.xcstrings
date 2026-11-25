@@ -728,6 +728,39 @@
         }
       }
     },
+    "Kimi Code returned no quota information." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kimi Code 未返回配额信息。"
+          }
+        }
+      }
+    },
+    "MiniMax API returned an error." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MiniMax 接口返回错误。"
+          }
+        }
+      }
+    },
+    "MiniMax returned no quota information." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MiniMax 未返回配额信息。"
+          }
+        }
+      }
+    },
     "Google AI Pro support is planned for v2.1." : {
       "extractionState" : "manual",
       "localizations" : {

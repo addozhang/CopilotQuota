@@ -62,7 +62,7 @@ struct DualProviderAccountQuery: EntityQuery {
             if case .rollingWindows(let windows) = snapshots[acc.id]?.metric {
                 return windows.count >= 2
             }
-            return acc.kind == .glm
+            return acc.kind.isMultiWindow
         }
         let others = accounts.filter { acc in !multiWindow.contains(where: { $0.id == acc.id }) }
         return multiWindow + others
@@ -96,7 +96,7 @@ struct SelectSingleProviderIntent: WidgetConfigurationIntent {
 
 struct SelectDualProviderIntent: WidgetConfigurationIntent {
     static var title: LocalizedStringResource = "Dual Rings"
-    static var description = IntentDescription("Choose a multi-window provider (such as GLM 5h + 7d) to display both rings.")
+    static var description = IntentDescription("Choose a multi-window provider (GLM, Kimi Code, MiniMax) to display both rings.")
 
     @Parameter(title: "Provider")
     var account: DualProviderAccountEntity?
@@ -308,7 +308,7 @@ struct DualRingWidget: Widget {
             DualRingEntryView(entry: entry)
         }
         .configurationDisplayName("QuotaRing · Dual")
-        .description("Two battery-style rings for one multi-window provider (e.g. GLM 5h + 7d).")
+        .description("Two battery-style rings for one multi-window provider (GLM, Kimi Code, MiniMax 5h + 7d).")
         .supportedFamilies([.systemMedium])
     }
 }

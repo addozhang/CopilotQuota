@@ -167,4 +167,59 @@ final class QuotaCoreModelsTests: XCTestCase {
         XCTAssertEqual(copilotDual.count, 1)
         XCTAssertEqual(copilotDual[0].kind, .copilot)
     }
+
+    func testWidgetSlotResolverDualSupportsKimiAndMiniMax() {
+        let copilot = ProviderAccount(kind: .copilot, sortOrder: 0)
+        let kimi = ProviderAccount(kind: .kimi, sortOrder: 1)
+        let minimax = ProviderAccount(kind: .minimax, region: MiniMaxRegion.global.rawValue, sortOrder: 2)
+
+        let kimiSnap = ProviderSnapshot(
+            accountID: kimi.id,
+            kind: .kimi,
+            metric: .rollingWindows([
+                QuotaWindow(id: "5h-0", label: "5h", percentRemaining: 93),
+                QuotaWindow(id: "7d", label: "7d", percentRemaining: 98),
+            ])
+        )
+        let minimaxSnap = ProviderSnapshot(
+            accountID: minimax.id,
+            kind: .minimax,
+            metric: .rollingWindows([
+                QuotaWindow(id: "5h", label: "5h", percentRemaining: 80),
+                QuotaWindow(id: "7d", label: "7d", percentRemaining: 15),
+            ])
+        )
+
+        let accounts = [copilot, kimi, minimax]
+        let snapshots = [kimi.id: kimiSnap, minimax.id: minimaxSnap]
+
+        // Default dual selection prefers Kimi Code over Copilot when no GLM exists.
+        let defaultDual = WidgetSlotResolver.resolveDual(
+            selectedAccountID: nil,
+            accounts: accounts,
+            snapshots: snapshots
+        )
+        XCTAssertEqual(defaultDual.count, 2)
+        XCTAssertEqual(defaultDual[0].kind, .kimi)
+        XCTAssertEqual(defaultDual[0].title, "Kimi Code")
+        XCTAssertEqual(defaultDual[0].windowLabel, "5h")
+        XCTAssertEqual(defaultDual[0].presentation.primaryText, "93%")
+        XCTAssertEqual(defaultDual[1].windowLabel, "7d")
+        XCTAssertEqual(defaultDual[1].presentation.primaryText, "98%")
+
+        // Explicit MiniMax selection splits into MiniMax 5h + 7d with warning tone on 7d.
+        let mmDual = WidgetSlotResolver.resolveDual(
+            selectedAccountID: minimax.id,
+            accounts: accounts,
+            snapshots: snapshots
+        )
+        XCTAssertEqual(mmDual.count, 2)
+        XCTAssertEqual(mmDual[0].kind, .minimax)
+        XCTAssertEqual(mmDual[0].title, "MiniMax Coding")
+        XCTAssertEqual(mmDual[0].windowLabel, "5h")
+        XCTAssertEqual(mmDual[0].presentation.tone, .normal)
+        XCTAssertEqual(mmDual[1].windowLabel, "7d")
+        XCTAssertEqual(mmDual[1].presentation.primaryText, "15%")
+        XCTAssertEqual(mmDual[1].presentation.tone, .warning)
+    }
 }

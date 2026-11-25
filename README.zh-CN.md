@@ -15,8 +15,9 @@
 - **GitHub Copilot** — OAuth 设备授权 · 月度高级请求配额与重置倒计时
 - **DeepSeek** — API Key · 预付余额（`CNY` / `USD`，含充值/赠金明细，支持可选参考上限与低余额变色）
 - **OpenRouter** — API Key · 美元预付额度与可选预算上限
-- **GLM Coding Plan** — API Key · 同时支持国内站（`open.bigmodel.cn`）与国际站（`api.z.ai`）· 5 小时与周滚动窗口
-- *（v2.1 规划：Google AI Pro 支持与低配额系统通知）*
+- **GLM Coding Plan** — API Key · 同时支持国内站（`open.bigmodel.cn`）与国际站（`api.z.ai`）· 5 小时与 7 天滚动窗口
+- **Kimi Code** — API Key（`sk-kimi-...`）· 5 小时与 7 天滚动窗口
+- **MiniMax Coding** — API Key（`sk-cp-...`）· 同时支持国内站（`api.minimaxi.com`）与国际站（`api.minimax.io`）· 5 小时与 7 天滚动窗口
 
 ## 安装
 
@@ -37,11 +38,11 @@ brew install --cask quotaring
 ## 使用
 
 1. 点击顶部菜单栏中的 **QuotaRing** 图标（默认仅显示图标，隐藏 Dock 图标）。
-2. 点击 **+** 连接 GitHub Copilot、DeepSeek、GLM Coding 或 OpenRouter。
+2. 点击 **+** 连接 GitHub Copilot、DeepSeek、OpenRouter、GLM Coding、Kimi Code 或 MiniMax Coding。
    *（从 Copilot Quota v1.x 升级时，原有的 GitHub Copilot Keychain 凭证与偏好设置会自动无缝迁移。）*
 3. 右键桌面 → **编辑小组件** → 搜索 **QuotaRing**：
-   - **小号小组件**：单个电池风圆环（右键「编辑小组件」可自由选择绑定的服务）。
-   - **中号小组件**：仿系统电池中号小组件，一排并列展示 2–4 个圆环。
+   - **QuotaRing · Single（小号）**：单个电池风圆环（右键「编辑小组件」可自由选择绑定的服务）。
+   - **QuotaRing · Dual（中号）**：为多窗口服务（GLM Coding、Kimi Code、MiniMax Coding）并列展示 `5h` + `7d` 双环。
 
 ## 从源码构建与测试
 

@@ -10,6 +10,7 @@ struct AddProviderView: View {
     @State private var selectedKind: ProviderKind?
     @State private var apiKey = ""
     @State private var glmRegion: GLMRegion = .cn
+    @State private var minimaxRegion: MiniMaxRegion = .cn
     @State private var capText = ""
     @State private var warningText = ""
     @State private var criticalText = ""
@@ -26,6 +27,7 @@ struct AddProviderView: View {
         self.onDismiss = onDismiss
         _selectedKind = State(initialValue: editingAccount?.kind ?? initialKind)
         _glmRegion = State(initialValue: editingAccount?.glmRegion ?? .cn)
+        _minimaxRegion = State(initialValue: editingAccount?.minimaxRegion ?? .cn)
         _capText = State(initialValue: editingAccount?.balanceReferenceCap.map { String(format: "%.0f", $0) } ?? "")
         _warningText = State(initialValue: editingAccount?.warningThreshold.map { String(format: "%.0f", $0) } ?? "")
         _criticalText = State(initialValue: editingAccount?.criticalThreshold.map { String(format: "%.0f", $0) } ?? "")
@@ -115,17 +117,6 @@ struct AddProviderView: View {
                 .opacity(alreadyAdded ? 0.55 : 1.0)
                 .linkCursor()
             }
-
-            // Placeholder note for Google AI Pro (v2.1).
-            HStack(spacing: 8) {
-                Image(systemName: "clock")
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
-                Text(L("Google AI Pro support is planned for v2.1."))
-                    .font(.caption2)
-                    .foregroundStyle(.tertiary)
-            }
-            .padding(.top, 4)
         }
     }
 
@@ -144,6 +135,19 @@ struct AddProviderView: View {
                         .foregroundStyle(.secondary)
                     Picker(L("Region"), selection: $glmRegion) {
                         ForEach(GLMRegion.allCases) { region in
+                            Text(region.displayName).tag(region)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .labelsHidden()
+                }
+            } else if kind == .minimax {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(L("Region"))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Picker(L("Region"), selection: $minimaxRegion) {
+                        ForEach(MiniMaxRegion.allCases) { region in
                             Text(region.displayName).tag(region)
                         }
                     }
@@ -219,7 +223,12 @@ struct AddProviderView: View {
         let cap = Double(capText.trimmingCharacters(in: .whitespacesAndNewlines))
         let warning = Double(warningText.trimmingCharacters(in: .whitespacesAndNewlines))
         let critical = Double(criticalText.trimmingCharacters(in: .whitespacesAndNewlines))
-        let regionValue = kind == .glm ? glmRegion.rawValue : nil
+        let regionValue: String?
+        switch kind {
+        case .glm: regionValue = glmRegion.rawValue
+        case .minimax: regionValue = minimaxRegion.rawValue
+        default: regionValue = nil
+        }
 
         if var existing = editingAccount {
             existing.region = regionValue
@@ -245,7 +254,7 @@ struct AddProviderView: View {
         case .copilot: return L("OAuth Device Flow · Monthly premium requests")
         case .deepseek: return L("API Key · Prepaid balance (CNY / USD)")
         case .openrouter: return L("API Key · Prepaid credits (USD)")
-        case .glm: return L("API Key · 5h & weekly rolling windows")
+        case .glm, .kimi, .minimax: return L("API Key · 5h & weekly rolling windows")
         }
     }
 
@@ -254,6 +263,8 @@ struct AddProviderView: View {
         case .deepseek: return "sk-..."
         case .openrouter: return "sk-or-v1-..."
         case .glm: return "id.secret"
+        case .kimi: return "sk-kimi-..."
+        case .minimax: return "sk-cp-..."
         case .copilot: return ""
         }
     }

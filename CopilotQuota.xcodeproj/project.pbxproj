@@ -52,6 +52,8 @@
 		AA0000000000000000000228 /* DeepSeekProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000208 /* DeepSeekProvider.swift */; };
 		AA0000000000000000000229 /* OpenRouterProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000209 /* OpenRouterProvider.swift */; };
 		AA000000000000000000022A /* GLMProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000020A /* GLMProvider.swift */; };
+		AA000000000000000000022C /* KimiProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000020F /* KimiProvider.swift */; };
+		AA000000000000000000022D /* MiniMaxProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000211 /* MiniMaxProvider.swift */; };
 		AA000000000000000000022B /* QuotaCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000020B /* QuotaCoordinator.swift */; };
 		AA0000000000000000000231 /* QuotaCoreModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000201 /* QuotaCoreModels.swift */; };
 		AA0000000000000000000232 /* ProviderGlyphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000202 /* ProviderGlyphView.swift */; };
@@ -64,6 +66,8 @@
 		AA0000000000000000000246 /* DeepSeekProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000208 /* DeepSeekProvider.swift */; };
 		AA0000000000000000000247 /* OpenRouterProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000209 /* OpenRouterProvider.swift */; };
 		AA0000000000000000000248 /* GLMProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000020A /* GLMProvider.swift */; };
+		AA000000000000000000024F /* KimiProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000020F /* KimiProvider.swift */; };
+		AA0000000000000000000250 /* MiniMaxProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000211 /* MiniMaxProvider.swift */; };
 		AA0000000000000000000249 /* QuotaCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000020B /* QuotaCoordinator.swift */; };
 		AA000000000000000000024A /* LaunchAtLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000103 /* LaunchAtLogin.swift */; };
 		AA000000000000000000024C /* QuotaCoreModelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000020C /* QuotaCoreModelsTests.swift */; };
@@ -131,6 +135,8 @@
 		AA0000000000000000000208 /* DeepSeekProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepSeekProvider.swift; sourceTree = "<group>"; };
 		AA0000000000000000000209 /* OpenRouterProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenRouterProvider.swift; sourceTree = "<group>"; };
 		AA000000000000000000020A /* GLMProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GLMProvider.swift; sourceTree = "<group>"; };
+		AA000000000000000000020F /* KimiProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KimiProvider.swift; sourceTree = "<group>"; };
+		AA0000000000000000000211 /* MiniMaxProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniMaxProvider.swift; sourceTree = "<group>"; };
 		AA000000000000000000020B /* QuotaCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaCoordinator.swift; sourceTree = "<group>"; };
 		AA000000000000000000020C /* QuotaCoreModelsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaCoreModelsTests.swift; sourceTree = "<group>"; };
 		AA000000000000000000020D /* ProvidersDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProvidersDecodingTests.swift; sourceTree = "<group>"; };
@@ -209,6 +215,8 @@
 				AA0000000000000000000208 /* DeepSeekProvider.swift */,
 				AA0000000000000000000209 /* OpenRouterProvider.swift */,
 				AA000000000000000000020A /* GLMProvider.swift */,
+				AA000000000000000000020F /* KimiProvider.swift */,
+				AA0000000000000000000211 /* MiniMaxProvider.swift */,
 				AA000000000000000000020B /* QuotaCoordinator.swift */,
 			);
 			path = Providers;
@@ -387,6 +395,8 @@
 				AA0000000000000000000228 /* DeepSeekProvider.swift in Sources */,
 				AA0000000000000000000229 /* OpenRouterProvider.swift in Sources */,
 				AA000000000000000000022A /* GLMProvider.swift in Sources */,
+				AA000000000000000000022C /* KimiProvider.swift in Sources */,
+				AA000000000000000000022D /* MiniMaxProvider.swift in Sources */,
 				AA000000000000000000022B /* QuotaCoordinator.swift in Sources */,
 				AA000000000000000000007A /* QuotaModels.swift in Sources */,
 				AA000000000000000000007B /* CopilotQuotaClient.swift in Sources */,
@@ -433,6 +443,8 @@
 				AA0000000000000000000246 /* DeepSeekProvider.swift in Sources */,
 				AA0000000000000000000247 /* OpenRouterProvider.swift in Sources */,
 				AA0000000000000000000248 /* GLMProvider.swift in Sources */,
+				AA000000000000000000024F /* KimiProvider.swift in Sources */,
+				AA0000000000000000000250 /* MiniMaxProvider.swift in Sources */,
 				AA0000000000000000000249 /* QuotaCoordinator.swift in Sources */,
 				AA000000000000000000024A /* LaunchAtLogin.swift in Sources */,
 				AA0000000000000000000123 /* QuotaModels.swift in Sources */,
@@ -514,7 +526,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = NO;
 				ENABLE_PREVIEWS = YES;
@@ -527,7 +539,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2.0.1;
+				MARKETING_VERSION = 2.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = app.solocraft.quotaring;
 				PRODUCT_NAME = QuotaRing;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -539,7 +551,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = NO;
 				ENABLE_PREVIEWS = YES;
@@ -552,7 +564,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2.0.1;
+				MARKETING_VERSION = 2.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = app.solocraft.quotaring;
 				PRODUCT_NAME = QuotaRing;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -564,7 +576,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				CODE_SIGN_ENTITLEMENTS = CopilotQuotaWidget/CopilotQuotaWidget.entitlements;
 				ENABLE_APP_SANDBOX = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -573,7 +585,7 @@
 					"$(inherited)",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.0.1;
+				MARKETING_VERSION = 2.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = app.solocraft.quotaring.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -587,7 +599,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				CODE_SIGN_ENTITLEMENTS = CopilotQuotaWidget/CopilotQuotaWidget.entitlements;
 				ENABLE_APP_SANDBOX = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -596,7 +608,7 @@
 					"$(inherited)",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.0.1;
+				MARKETING_VERSION = 2.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = app.solocraft.quotaring.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

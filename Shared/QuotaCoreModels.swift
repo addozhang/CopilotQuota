@@ -3,13 +3,15 @@ import SwiftUI
 
 /// Supported AI quota providers.
 ///
-/// Additional providers (such as Google AI Pro in v2.1) can be added as new
-/// cases without changing the storage, ring renderer, or widget architecture.
+/// Additional providers can be added as new cases without changing the storage,
+/// ring renderer, or widget architecture.
 public enum ProviderKind: String, Codable, CaseIterable, Identifiable, Sendable {
     case copilot
     case deepseek
     case openrouter
     case glm
+    case kimi
+    case minimax
 
     public var id: String { rawValue }
 
@@ -19,6 +21,8 @@ public enum ProviderKind: String, Codable, CaseIterable, Identifiable, Sendable 
         case .deepseek: return "DeepSeek"
         case .openrouter: return "OpenRouter"
         case .glm: return "GLM Coding"
+        case .kimi: return "Kimi Code"
+        case .minimax: return "MiniMax Coding"
         }
     }
 
@@ -28,13 +32,22 @@ public enum ProviderKind: String, Codable, CaseIterable, Identifiable, Sendable 
         case .deepseek: return "DeepSeek"
         case .openrouter: return "OpenRouter"
         case .glm: return "GLM"
+        case .kimi: return "Kimi"
+        case .minimax: return "MiniMax"
         }
     }
 
     public var isBalanceBased: Bool {
         switch self {
         case .deepseek, .openrouter: return true
-        case .copilot, .glm: return false
+        case .copilot, .glm, .kimi, .minimax: return false
+        }
+    }
+
+    public var isMultiWindow: Bool {
+        switch self {
+        case .glm, .kimi, .minimax: return true
+        case .copilot, .deepseek, .openrouter: return false
         }
     }
 
@@ -42,7 +55,7 @@ public enum ProviderKind: String, Codable, CaseIterable, Identifiable, Sendable 
         switch self {
         case .deepseek: return "¥"
         case .openrouter: return "$"
-        case .copilot, .glm: return ""
+        case .copilot, .glm, .kimi, .minimax: return ""
         }
     }
 }
@@ -66,6 +79,38 @@ public enum GLMRegion: String, Codable, CaseIterable, Identifiable, Sendable {
             return URL(string: "https://open.bigmodel.cn/api/monitor/usage/quota/limit")!
         case .global:
             return URL(string: "https://api.z.ai/api/monitor/usage/quota/limit")!
+        }
+    }
+}
+
+public enum MiniMaxRegion: String, Codable, CaseIterable, Identifiable, Sendable {
+    case cn
+    case global
+
+    public var id: String { rawValue }
+
+    public var displayName: String {
+        switch self {
+        case .cn: return "China (api.minimaxi.com)"
+        case .global: return "Global (api.minimax.io)"
+        }
+    }
+
+    public var quotaURL: URL {
+        switch self {
+        case .cn:
+            return URL(string: "https://api.minimaxi.com/v1/api/openplatform/coding_plan/remains")!
+        case .global:
+            return URL(string: "https://api.minimax.io/v1/api/openplatform/coding_plan/remains")!
+        }
+    }
+
+    public var fallbackQuotaURL: URL {
+        switch self {
+        case .cn:
+            return URL(string: "https://api.minimaxi.com/v1/token_plan/remains")!
+        case .global:
+            return URL(string: "https://api.minimax.io/v1/token_plan/remains")!
         }
     }
 }
@@ -119,6 +164,10 @@ public struct ProviderAccount: Codable, Equatable, Identifiable, Sendable {
 
     public var glmRegion: GLMRegion {
         GLMRegion(rawValue: region ?? "") ?? .cn
+    }
+
+    public var minimaxRegion: MiniMaxRegion {
+        MiniMaxRegion(rawValue: region ?? "") ?? .cn
     }
 }
 
@@ -424,7 +473,7 @@ public enum WidgetSlotResolver {
             if case .rollingWindows(let windows) = snapshots[acc.id]?.metric {
                 return windows.count >= 2
             }
-            return acc.kind == .glm
+            return acc.kind.isMultiWindow
         }) {
             target = multiWindow
         } else {
